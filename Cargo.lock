@@ -451,6 +451,7 @@ dependencies = [
  "glob",
  "image",
  "minifb",
+ "multicache",
  "pixels",
  "softbuffer",
  "thiserror",
@@ -840,6 +841,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "linked-hash-map"
+version = "0.5.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0717cef1bc8b636c6e1c1bbdefc09e6322da8a9321966e8928ef80d20f7f770f"
+
+[[package]]
 name = "linux-raw-sys"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -980,6 +987,15 @@ dependencies = [
  "log",
  "wasi",
  "windows-sys 0.45.0",
+]
+
+[[package]]
+name = "multicache"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5086074c0a0812980aa88703d1bbcb4433e8423ecf4098a9849934f3dc09ba72"
+dependencies = [
+ "linked-hash-map",
 ]
 
 [[package]]
