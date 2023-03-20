@@ -2,13 +2,15 @@ use crate::prelude::*;
 use image::DynamicImage;
 use std::path::PathBuf;
 
-use crate::cache::simple::SimpleCache;
+// use crate::cache::simple::SimpleCache;
+
+// TODO: study multicache crate
 
 #[derive(Default)]
 pub struct AssetCollection {
     // assets: CycleVec<PathBuf>,
     assets: Vec<PathBuf>,
-    cache: SimpleCache<DynamicImage>,
+    // cache: SimpleCache<DynamicImage>,
 }
 
 // impl Job<DynamicImage> for DynamicImage {
@@ -22,7 +24,7 @@ impl AssetCollection {
     pub fn new(paths: Vec<PathBuf>) -> Self {
         Self {
             assets: paths,
-            cache: SimpleCache::default(),
+            ..Default::default()
         }
     }
 

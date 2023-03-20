@@ -1,8 +1,13 @@
+#![allow(dead_code)]
+
 mod cache;
 mod collection;
 mod cyclevec;
 mod error;
 // mod filesystem;
+mod app;
+mod buffer;
+mod layout;
 mod prelude;
 mod window;
 

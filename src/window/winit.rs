@@ -1,7 +1,11 @@
 // https://github.com/parasyte/pixels/blob/main/examples/minimal-winit/src/main.rs
 
+// use std::num::NonZeroU32;
+// use fast_image_resize as fir;
+
 use image::{imageops::FilterType, DynamicImage, GenericImage, GenericImageView};
 use softbuffer::GraphicsContext;
+
 #[cfg(target_os = "macos")]
 use winit::platform::macos::WindowExtMacOS;
 use winit::{
@@ -87,15 +91,16 @@ impl Window {
                             window.set_decorations(decorations);
                         }
                         VirtualKeyCode::J => {
-                            println!("j hit");
-                            let image = collection.next().unwrap();
-                            // let image =
-                            //     image.resize(width as u32, height as u32, FilterType::Lanczos3);
-                            // let image =
-                            //     image::open("../_assets/girl.jpg").expect("Failed to open image");
+                            let image: DynamicImage = collection.next().unwrap();
+                            let image =
+                                image.resize(width as u32, height as u32, FilterType::Lanczos3);
 
                             let mut screen = DynamicImage::new_rgb8(width as u32, height as u32);
-                            screen.copy_from(&image, 0, 0).unwrap();
+                            //
+                            // align horizontal center by calculating left offset
+                            let left_offset = width / 2 - image.width() as usize / 2;
+
+                            screen.copy_from(&image, left_offset as u32, 0).unwrap();
 
                             screen_buffer = image_to_u32(screen);
                             window.request_redraw();
