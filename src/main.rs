@@ -8,6 +8,7 @@ mod error;
 mod app;
 mod buffer;
 mod layout;
+mod loader;
 mod prelude;
 mod window;
 

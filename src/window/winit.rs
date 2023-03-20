@@ -18,6 +18,22 @@ use crate::AssetCollection;
 
 pub struct Window;
 
+fn render_single_view(image: DynamicImage, width: u32, height: u32) -> Vec<u32> {
+    let image = image.resize(width, height, FilterType::Lanczos3);
+
+    // create a screen-sized buffer
+    let mut screen = DynamicImage::new_rgb8(width as u32, height as u32);
+
+    // align horizontal center by calculating left offset
+    let left_offset = width / 2 - image.width() / 2;
+
+    screen
+        .copy_from(&image, left_offset as u32, 0)
+        .expect("screen copy fail");
+
+    image_to_u32(screen)
+}
+
 fn image_to_u32(img: DynamicImage) -> Vec<u32> {
     let (img_width, img_height) = img.dimensions();
     let mut buffer: Vec<u32> = vec![];
@@ -63,6 +79,9 @@ impl Window {
         let mut graphics_context = unsafe { GraphicsContext::new(&window, &window) }.unwrap();
         graphics_context.set_buffer(&screen_buffer, width as u16, height as u16);
 
+        let image: DynamicImage = collection.next().unwrap();
+        screen_buffer = render_single_view(image, width as u32, height as u32);
+
         event_loop.run(move |event, _elwt, control_flow| {
             control_flow.set_wait();
 
@@ -92,17 +111,7 @@ impl Window {
                         }
                         VirtualKeyCode::J => {
                             let image: DynamicImage = collection.next().unwrap();
-                            let image =
-                                image.resize(width as u32, height as u32, FilterType::Lanczos3);
-
-                            let mut screen = DynamicImage::new_rgb8(width as u32, height as u32);
-                            //
-                            // align horizontal center by calculating left offset
-                            let left_offset = width / 2 - image.width() as usize / 2;
-
-                            screen.copy_from(&image, left_offset as u32, 0).unwrap();
-
-                            screen_buffer = image_to_u32(screen);
+                            screen_buffer = render_single_view(image, width as u32, height as u32);
                             window.request_redraw();
                         }
                         _ => (),
