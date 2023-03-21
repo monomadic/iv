@@ -3,7 +3,7 @@ use std::num::NonZeroU32;
 pub struct ScreenBuffer {
     width: NonZeroU32,
     height: NonZeroU32,
-    buffer: Vec<u32>,
+    pub buffer: Vec<u32>,
 }
 
 impl ScreenBuffer {

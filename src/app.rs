@@ -1,15 +1,15 @@
 use crate::{layout::LayoutState, AssetCollection};
 
 #[derive(Default)]
-pub struct App {
-    pub collection: AssetCollection,
+pub struct AppState {
+    pub assets: AssetCollection,
     layout: LayoutState,
 }
 
-impl App {
+impl AppState {
     pub fn new(collection: AssetCollection) -> Self {
-        App {
-            collection,
+        AppState {
+            assets: collection,
             ..Default::default()
         }
     }

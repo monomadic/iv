@@ -3,7 +3,6 @@
 // use std::num::NonZeroU32;
 // use fast_image_resize as fir;
 
-use image::{imageops::FilterType, DynamicImage, GenericImage, GenericImageView};
 use softbuffer::GraphicsContext;
 
 #[cfg(target_os = "macos")]
@@ -14,45 +13,9 @@ use winit::{
     window::WindowBuilder,
 };
 
-use crate::AssetCollection;
+use crate::{layout::render_single_view, AssetCollection};
 
 pub struct Window;
-
-fn render_single_view(image: DynamicImage, width: u32, height: u32) -> Vec<u32> {
-    let image = image.resize(width, height, FilterType::Lanczos3);
-
-    // create a screen-sized buffer
-    let mut screen = DynamicImage::new_rgb8(width as u32, height as u32);
-
-    // align horizontal center by calculating left offset
-    let left_offset = width / 2 - image.width() / 2;
-
-    screen
-        .copy_from(&image, left_offset as u32, 0)
-        .expect("screen copy fail");
-
-    image_to_u32(screen)
-}
-
-fn image_to_u32(img: DynamicImage) -> Vec<u32> {
-    let (img_width, img_height) = img.dimensions();
-    let mut buffer: Vec<u32> = vec![];
-    buffer.resize((img_width * img_height) as usize, 0);
-
-    for y in 0..img_height {
-        for x in 0..img_width {
-            let pixel = img.get_pixel(x, y);
-            let rgba = pixel.0;
-            let color = ((rgba[3] as u32) << 24)
-                | ((rgba[0] as u32) << 16)
-                | ((rgba[1] as u32) << 8)
-                | (rgba[2] as u32);
-            buffer[y as usize * img_width as usize + x as usize] = color;
-        }
-    }
-
-    buffer
-}
 
 impl Window {
     pub fn new(mut collection: AssetCollection) {
@@ -61,7 +24,7 @@ impl Window {
             .with_title("fbi")
             .with_decorations(false)
             .build(&event_loop)
-            .unwrap();
+            .expect("winit failed to initialize window");
 
         let mut decorations = true;
 
@@ -76,10 +39,11 @@ impl Window {
             .map(|_| 0)
             .collect::<Vec<u32>>();
 
-        let mut graphics_context = unsafe { GraphicsContext::new(&window, &window) }.unwrap();
+        let mut graphics_context = unsafe { GraphicsContext::new(&window, &window) }
+            .expect("failed to initialize graphics context");
         graphics_context.set_buffer(&screen_buffer, width as u16, height as u16);
 
-        let image: DynamicImage = collection.next().unwrap();
+        let image = collection.next().expect("failed to find next image");
         screen_buffer = render_single_view(image, width as u32, height as u32);
 
         event_loop.run(move |event, _elwt, control_flow| {
@@ -110,7 +74,7 @@ impl Window {
                             window.set_decorations(decorations);
                         }
                         VirtualKeyCode::J => {
-                            let image: DynamicImage = collection.next().unwrap();
+                            let image = collection.next().unwrap();
                             screen_buffer = render_single_view(image, width as u32, height as u32);
                             window.request_redraw();
                         }

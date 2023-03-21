@@ -21,7 +21,7 @@ fn main() {
     // deal with cli
     let path = env::args().nth(1).unwrap_or("assets/*".into());
     let input_paths: Vec<PathBuf> = glob::glob(&path)
-        .unwrap()
+        .expect("valid glob")
         .filter_map(|path| path.ok())
         .filter(|path| path.file_name().unwrap() != ".DS_Store")
         .collect();
