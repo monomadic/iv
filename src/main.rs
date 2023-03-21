@@ -22,7 +22,8 @@ fn main() {
     // deal with cli
     let path = env::args().nth(1).unwrap_or("assets/*".into());
     let input_paths = path_from_args(&path).expect("path fail");
-    // crate asset cache
+
+    // asset cache
     let collection = AssetCollection::new(input_paths);
 
     // show window
