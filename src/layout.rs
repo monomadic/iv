@@ -13,6 +13,10 @@ impl LayoutState {
     }
 }
 
+// multi view
+// takes a collection
+// static view at first iterating entire collection of loaded objects
+
 pub fn render_single_view(image: DynamicImage, width: u32, height: u32) -> Vec<u32> {
     let image = image.resize(width, height, FilterType::Lanczos3);
 
