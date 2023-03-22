@@ -21,14 +21,16 @@ pub fn path_from_args(arg: &str) -> Result<Vec<PathBuf>> {
         .collect())
 }
 
-pub fn get_folder(path: PathBuf) -> PathBuf {
+pub fn get_folder(path: PathBuf) -> Option<PathBuf> {
+    if !path.exists() {
+        return None;
+    }
     if path.is_file() {
         // return surrounding dir
-        path.parent().unwrap_or(&Path::new("/"))
+        path.parent().map(PathBuf::from)
     } else {
-        &path.as_path()
+        Some(path)
     }
-    .into()
 }
 
 #[cfg(test)]
