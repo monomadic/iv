@@ -1,8 +1,9 @@
 // loading strategy
 
-use std::path::{Path, PathBuf};
+use thiserror::__private::PathAsDisplay;
 
 use crate::prelude::*;
+use std::path::PathBuf;
 
 // TODO: return a cursor position, etc
 
@@ -14,14 +15,27 @@ fn is_supported_image(entry: &PathBuf) -> bool {
         .unwrap_or(false)
 }
 
-pub fn path_from_args(arg: &str) -> Result<Vec<PathBuf>> {
+pub fn glob_from_arg(arg: &str) -> Result<Vec<PathBuf>> {
     Ok(glob::glob(&arg)?
         .filter_map(|e| e.ok())
         .filter(is_supported_image)
         .collect())
 }
 
-pub fn get_folder(path: PathBuf) -> Option<PathBuf> {
+pub fn paths_from_arg(arg: &str) -> Result<Vec<PathBuf>> {
+    let mut files = glob_from_arg(arg)?;
+    if files.len() == 1 {
+        // walkdir?
+    }
+
+    Ok(files)
+}
+
+pub fn get_surrounding_files(file: PathBuf) -> Result<Vec<PathBuf>> {
+    todo!()
+}
+
+pub fn get_folder_for_file(path: &PathBuf) -> Option<PathBuf> {
     if !path.exists() {
         return None;
     }
@@ -29,7 +43,7 @@ pub fn get_folder(path: PathBuf) -> Option<PathBuf> {
         // return surrounding dir
         path.parent().map(PathBuf::from)
     } else {
-        Some(path)
+        Some(path.clone())
     }
 }
 
@@ -39,24 +53,24 @@ mod tests {
 
     #[test]
     fn test_empty() {
-        assert!(path_from_args("").unwrap().is_empty())
+        assert!(glob_from_arg("").unwrap().is_empty())
     }
 
     #[test]
     fn test_single_file() {
-        assert_eq!(path_from_args("assets/cyberpunk.jpg").unwrap().len(), 1);
+        assert_eq!(glob_from_arg("assets/cyberpunk.jpg").unwrap().len(), 1);
     }
 
     #[test]
     fn test_glob() {
-        assert_eq!(path_from_args("assets/*.*").unwrap().len(), 4);
+        assert_eq!(glob_from_arg("assets/*.*").unwrap().len(), 4);
     }
 
     #[test]
     fn test_get_folder() {
         assert_eq!(
-            get_folder("assets/cyberpunk.jpg".into()),
-            PathBuf::from("assets")
+            get_folder_for_file(&PathBuf::from("assets/cyberpunk.jpg")),
+            Some(PathBuf::from("assets"))
         );
     }
 }

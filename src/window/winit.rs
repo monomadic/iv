@@ -3,6 +3,8 @@
 // use std::num::NonZeroU32;
 // use fast_image_resize as fir;
 
+use std::{sync::mpsc, thread};
+
 use softbuffer::GraphicsContext;
 
 #[cfg(target_os = "macos")]
@@ -30,21 +32,23 @@ impl Window {
 
         // go fullscreen
         window.set_simple_fullscreen(true);
-        let size = window.inner_size();
-        let width = size.width as usize;
-        let height = size.height as usize;
 
-        // create screen buffer
-        let mut screen_buffer = (0..((width * height) as usize))
-            .map(|_| 0)
-            .collect::<Vec<u32>>();
+        let (width, height): (u16, u16) = window.inner_size().into();
 
-        let mut graphics_context = unsafe { GraphicsContext::new(&window, &window) }
-            .expect("failed to initialize graphics context");
+        // create screen buffer (black screen)
+        let mut screen_buffer = vec![0; (width as usize * height as usize)];
+        let mut graphics_context = unsafe { GraphicsContext::new(&window, &window) }.unwrap();
+
         graphics_context.set_buffer(&screen_buffer, width as u16, height as u16);
 
-        let image = collection.next().expect("failed to find next image");
-        screen_buffer = render_single_view(image, width as u32, height as u32);
+        let (tx, rx) = mpsc::channel();
+
+        // Preload the first image using mpsc channel
+        let preload_tx = tx.clone();
+        let image = collection.next().unwrap();
+        thread::spawn(move || {
+            preload_tx.send(AssetCollection::process(image)).unwrap();
+        });
 
         event_loop.run(move |event, _elwt, control_flow| {
             control_flow.set_wait();
@@ -74,15 +78,27 @@ impl Window {
                             window.set_decorations(decorations);
                         }
                         VirtualKeyCode::J => {
-                            let image = collection.next().unwrap();
-                            screen_buffer = render_single_view(image, width as u32, height as u32);
-                            window.request_redraw();
+                            // let image = collection.next().unwrap();
+                            // screen_buffer = render_single_view(image, width as u32, height as u32);
+                            // window.request_redraw();
+
+                            let next = collection.next().expect("ooooop");
+
+                            let result = AssetCollection::process(next);
+                            // Send the result back to the main thread.
+                            tx.send(result).unwrap();
                         }
                         _ => (),
                     },
                     _ => (),
                 },
                 _ => {}
+            }
+
+            if let Ok(result) = rx.try_recv() {
+                let image = result.expect("image failed to render");
+                screen_buffer = render_single_view(image, width as u32, height as u32);
+                window.request_redraw();
             }
         });
     }

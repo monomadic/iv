@@ -10,10 +10,11 @@ mod buffer;
 mod layout;
 mod loader;
 mod prelude;
+mod single_view;
 mod window;
 
 pub use collection::simple::AssetCollection;
-use loader::path_from_args;
+use loader::glob_from_arg;
 pub(crate) use window::Window;
 
 use std::env;
@@ -21,10 +22,10 @@ use std::env;
 fn main() {
     // deal with cli
     let path = env::args().nth(1).unwrap_or("assets/*".into());
-    let input_paths = path_from_args(&path).expect("path fail");
+    let assets = glob_from_arg(&path).expect("glob fail");
 
     // asset cache
-    let collection = AssetCollection::new(input_paths);
+    let collection = AssetCollection { assets };
 
     // show window
     Window::new(collection);

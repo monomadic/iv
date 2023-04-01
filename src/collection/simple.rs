@@ -9,7 +9,7 @@ use std::path::PathBuf;
 #[derive(Default)]
 pub struct AssetCollection {
     // assets: CycleVec<PathBuf>,
-    assets: Vec<PathBuf>,
+    pub assets: Vec<PathBuf>,
     // cache: SimpleCache<DynamicImage>,
 }
 
@@ -20,18 +20,15 @@ pub struct AssetCollection {
 // }
 
 impl AssetCollection {
-    /// Create a new asset collection from PathBufs
-    pub fn new(paths: Vec<PathBuf>) -> Self {
-        Self {
-            assets: paths,
-            ..Default::default()
-        }
+    pub fn process(path: PathBuf) -> Result<DynamicImage> {
+        image::open(path).map_err(|_| FBIError::Generic("yes".into()))
     }
 
     /// Get the next asset
-    pub fn next(&mut self) -> Result<DynamicImage> {
+    pub fn next(&mut self) -> Result<PathBuf> {
         if let Some(path) = self.assets.pop() {
-            return image::open(path).map_err(|_| FBIError::Generic("yes".into()));
+            return Ok(path);
+            //return image::open(path).map_err(|_| FBIError::Generic("yes".into()));
         }
 
         panic!("bad")
