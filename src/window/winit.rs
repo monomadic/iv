@@ -46,6 +46,7 @@ impl Window {
         // Preload the first image using mpsc channel
         let preload_tx = tx.clone();
         let image = collection.next().unwrap();
+
         thread::spawn(move || {
             preload_tx.send(AssetCollection::process(image)).unwrap();
         });
@@ -82,11 +83,12 @@ impl Window {
                             // screen_buffer = render_single_view(image, width as u32, height as u32);
                             // window.request_redraw();
 
-                            let next = collection.next().expect("ooooop");
+                            let preload_tx = tx.clone();
+                            let image = collection.next().expect("ooooop");
 
-                            let result = AssetCollection::process(next);
-                            // Send the result back to the main thread.
-                            tx.send(result).unwrap();
+                            thread::spawn(move || {
+                                preload_tx.send(AssetCollection::process(image)).unwrap();
+                            });
                         }
                         _ => (),
                     },

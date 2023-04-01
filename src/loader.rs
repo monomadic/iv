@@ -1,11 +1,35 @@
 // loading strategy
 
-use thiserror::__private::PathAsDisplay;
+use walkdir::{DirEntry, WalkDir};
 
 use crate::prelude::*;
 use std::path::PathBuf;
 
 // TODO: return a cursor position, etc
+
+pub fn parse_arg(arg: &str) -> Result<Vec<PathBuf>> {
+    let path = PathBuf::from(arg);
+
+    if path.is_file() {
+        // todo: cycle with position etc
+        return Ok(vec![path]);
+    }
+
+    if path.is_dir() {
+        return Ok(WalkDir::new(path)
+            .into_iter()
+            .filter_map(|e| e.ok())
+            .map(DirEntry::into_path)
+            .filter(is_supported_image)
+            .collect());
+    }
+
+    if !path.exists() {
+        panic!("bad path");
+    }
+
+    todo!()
+}
 
 fn is_supported_image(entry: &PathBuf) -> bool {
     entry
