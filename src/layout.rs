@@ -1,3 +1,4 @@
+use crate::prelude::*;
 use image::{imageops::FilterType, DynamicImage, GenericImage, GenericImageView};
 
 #[derive(Default)]
@@ -13,27 +14,45 @@ impl LayoutState {
     }
 }
 
-// multi view
-// takes a collection
-// static view at first iterating entire collection of loaded objects
+pub fn render_multi_view(
+    images: Vec<&DynamicImage>,
+    mut surface: DynamicImage,
+    rows: u32,
+) -> Result<DynamicImage> {
+    let row_height = surface.height() / rows;
 
-pub fn render_single_view(image: DynamicImage, width: u32, height: u32) -> Vec<u32> {
-    let image = image.resize(width, height, FilterType::Lanczos3);
+    for (i, image) in images.iter().enumerate() {
+        let image = image.resize(row_height, row_height, FilterType::Lanczos3);
 
-    // create a screen-sized buffer
-    let mut screen = DynamicImage::new_rgb8(width as u32, height as u32);
+        // align horizontal center by calculating left offset
+        let left_padding = 20 + (i as u32 * row_height);
+        let top_padding = 20;
 
-    // align horizontal center by calculating left offset
-    let left_offset = width / 2 - image.width() / 2;
+        surface
+            .copy_from(&image, left_padding, top_padding)
+            .map_err(|e| FBIError::Generic(e.to_string()))?;
+    }
 
-    screen
-        .copy_from(&image, left_offset as u32, 0)
-        .expect("screen copy fail");
-
-    image_to_u32(screen)
+    Ok(surface)
 }
 
-fn image_to_u32(img: DynamicImage) -> Vec<u32> {
+pub fn render_single_view(image: &DynamicImage, mut surface: DynamicImage) -> Result<DynamicImage> {
+    let surface_height = surface.height();
+    let surface_width = surface.width();
+
+    let image = image.resize(surface_width, surface_height, FilterType::Lanczos3);
+
+    // align horizontal center by calculating left offset
+    let left_offset = surface_width / 2 - image.width() / 2;
+
+    surface
+        .copy_from(&image, left_offset as u32, 0)
+        .map_err(|e| FBIError::Generic(e.to_string()))?;
+
+    Ok(surface)
+}
+
+pub fn image_to_u32(img: DynamicImage) -> Vec<u32> {
     let (img_width, img_height) = img.dimensions();
     let mut buffer: Vec<u32> = vec![];
     buffer.resize((img_width * img_height) as usize, 0);

@@ -3,6 +3,8 @@ use crate::{layout::LayoutState, AssetCollection};
 #[derive(Default)]
 pub struct AppState {
     pub assets: AssetCollection,
+    // cache:
+    // cursor:
     layout: LayoutState,
 }
 

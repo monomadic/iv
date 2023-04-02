@@ -1,10 +1,9 @@
 // https://github.com/parasyte/pixels/blob/main/examples/minimal-winit/src/main.rs
-
-// use std::num::NonZeroU32;
 // use fast_image_resize as fir;
 
 use std::{sync::mpsc, thread};
 
+use image::DynamicImage;
 use softbuffer::GraphicsContext;
 
 #[cfg(target_os = "macos")]
@@ -15,7 +14,7 @@ use winit::{
     window::WindowBuilder,
 };
 
-use crate::{layout::render_single_view, AssetCollection};
+use crate::AssetCollection;
 
 pub struct Window;
 
@@ -35,20 +34,25 @@ impl Window {
 
         let (width, height): (u16, u16) = window.inner_size().into();
 
+        // // create a screen-sized dynamic view
+        // let mut view = DynamicImage::new_rgb8(width, height);
+
         // create screen buffer (black screen)
-        let mut screen_buffer = vec![0; (width as usize * height as usize)];
+        let mut screen_buffer = vec![0; width as usize * height as usize];
         let mut graphics_context = unsafe { GraphicsContext::new(&window, &window) }.unwrap();
 
         graphics_context.set_buffer(&screen_buffer, width as u16, height as u16);
+        window.request_redraw();
 
         let (tx, rx) = mpsc::channel();
 
         // Preload the first image using mpsc channel
         let preload_tx = tx.clone();
-        let image = collection.next().unwrap();
+        let path = collection.next().expect("ooooop");
+        let image = collection.get(path);
 
         thread::spawn(move || {
-            preload_tx.send(AssetCollection::process(image)).unwrap();
+            preload_tx.send(image).unwrap();
         });
 
         event_loop.run(move |event, _elwt, control_flow| {
@@ -84,10 +88,11 @@ impl Window {
                             // window.request_redraw();
 
                             let preload_tx = tx.clone();
-                            let image = collection.next().expect("ooooop");
+                            let path = collection.next().expect("ooooop");
+                            let image = collection.get(path);
 
                             thread::spawn(move || {
-                                preload_tx.send(AssetCollection::process(image)).unwrap();
+                                preload_tx.send(image).unwrap();
                             });
                         }
                         _ => (),
@@ -99,7 +104,19 @@ impl Window {
 
             if let Ok(result) = rx.try_recv() {
                 let image = result.expect("image failed to render");
-                screen_buffer = render_single_view(image, width as u32, height as u32);
+
+                // create a screen-sized dynamic view
+                // (allocation?)
+                let view = DynamicImage::new_rgb8(width as u32, height as u32);
+
+                // let layout =
+                //     crate::layout::render_multi_view(vec![&image, &image], view, 3).expect("abc");
+
+                let layout = crate::layout::render_single_view(&image, view).expect("abc");
+
+                // screen_buffer = render_single_view(image, width as u32, height as u32);
+
+                screen_buffer = crate::layout::image_to_u32(layout);
                 window.request_redraw();
             }
         });

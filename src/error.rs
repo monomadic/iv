@@ -7,8 +7,9 @@ pub enum FBIError {
     Generic(String),
     //
     // /// For starter, to remove as code matures.
-    // #[error("Static error: {0}")]
-    // Static(&'static str),
+    #[error("Static error: {0}")]
+    Static(&'static str),
+
     #[error(transparent)]
     Glob(#[from] glob::PatternError),
 

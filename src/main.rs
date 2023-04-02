@@ -23,10 +23,10 @@ fn main() {
     let path = env::args().nth(1).unwrap_or("assets".into());
     //let assets = glob_from_arg(&path).expect("glob fail");
 
-    let assets = loader::parse_arg(&path).expect("path fail");
+    let paths = loader::parse_arg(&path).expect("path fail");
 
     // asset cache
-    let collection = AssetCollection { assets };
+    let collection = AssetCollection::new(paths);
 
     // show window
     Window::new(collection);

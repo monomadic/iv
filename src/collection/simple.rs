@@ -1,16 +1,12 @@
 use crate::prelude::*;
 use image::DynamicImage;
-use std::path::PathBuf;
-
-// use crate::cache::simple::SimpleCache;
-
-// TODO: study multicache crate
+use std::{collections::HashMap, path::PathBuf};
 
 #[derive(Default)]
 pub struct AssetCollection {
     // assets: CycleVec<PathBuf>,
     pub assets: Vec<PathBuf>,
-    // cache: SimpleCache<DynamicImage>,
+    cache: HashMap<PathBuf, DynamicImage>,
 }
 
 // impl Job<DynamicImage> for DynamicImage {
@@ -20,9 +16,26 @@ pub struct AssetCollection {
 // }
 
 impl AssetCollection {
-    pub fn process(path: PathBuf) -> Result<DynamicImage> {
-        image::open(path).map_err(|_| FBIError::Generic("yes".into()))
+    pub fn new(paths: Vec<PathBuf>) -> Self {
+        Self {
+            assets: paths,
+            cache: HashMap::new(),
+        }
     }
+
+    pub fn get(&mut self, path: PathBuf) -> Result<DynamicImage> {
+        image::open(&path).map_err(|_| FBIError::Generic("yes".into()))
+    }
+
+    // pub fn get(&mut self, path: PathBuf) -> Result<&DynamicImage> {
+    //     if let Some(image) = self.cache.get(&path) {
+    //         Ok(image)
+    //     } else {
+    //         let image = image::open(&path).map_err(|_| FBIError::Generic("yes".into()))?;
+    //         self.cache.insert(path, image);
+    //         Ok(&image)
+    //     }
+    // }
 
     /// Get the next asset
     pub fn next(&mut self) -> Result<PathBuf> {
