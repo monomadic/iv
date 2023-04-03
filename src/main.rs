@@ -21,8 +21,6 @@ use std::env;
 fn main() -> Result<()> {
     // deal with cli
     let path = env::args().nth(1).unwrap_or("assets".into());
-    //let assets = glob_from_arg(&path).expect("glob fail");
-
     let paths = loader::parse_arg(&path)?;
 
     // asset cache

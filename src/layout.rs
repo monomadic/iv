@@ -20,12 +20,14 @@ pub fn render_multi_view(
     rows: u32,
 ) -> Result<DynamicImage> {
     let row_height = surface.height() / rows;
+    // let surface_width = surface.width();
 
     for (i, image) in images.iter().enumerate() {
         let image = image.resize(row_height, row_height, FilterType::Lanczos3);
 
         // align horizontal center by calculating left offset
-        let left_padding = 20 + (i as u32 * row_height);
+        // pad + image_offset + centering_offset
+        let left_padding = 20 + (i as u32 * row_height) + (row_height / 2 - image.width() / 2);
         let top_padding = 20;
 
         surface

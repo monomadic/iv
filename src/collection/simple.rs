@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct AssetCollection {
     // assets: CycleVec<PathBuf>,
     pub assets: Vec<PathBuf>,
@@ -15,6 +15,10 @@ impl AssetCollection {
             // cache: HashMap::new(),
             cursor: 0,
         }
+    }
+
+    pub fn current(&self) -> Option<&PathBuf> {
+        self.assets.get(self.cursor)
     }
 
     /// Get the next asset
