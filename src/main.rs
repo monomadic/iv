@@ -23,6 +23,8 @@ fn main() -> Result<()> {
     let path = env::args().nth(1).unwrap_or("assets".into());
     let paths = loader::parse_arg(&path)?;
 
+    println!("paths: {:?}", &paths);
+
     // asset cache
     let collection = AssetCollection::new(paths);
 

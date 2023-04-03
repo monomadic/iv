@@ -26,8 +26,11 @@ struct UpdateState {
 impl UpdateState {
     fn load(path: PathBuf) -> Result<Self> {
         image::open(&path)
-            .map(|image| UpdateState { image, path })
-            .map_err(|_| FBIError::Static("update state failure"))
+            .map(|image| UpdateState {
+                image,
+                path: path.clone(),
+            })
+            .map_err(|e| FBIError::Generic(format!("update state failure: {:?}, {:?}", path, e)))
     }
 }
 
