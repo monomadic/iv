@@ -1,49 +1,41 @@
-use crate::prelude::*;
-use image::DynamicImage;
-use std::{collections::HashMap, path::PathBuf};
+use std::path::PathBuf;
 
 #[derive(Default)]
 pub struct AssetCollection {
     // assets: CycleVec<PathBuf>,
     pub assets: Vec<PathBuf>,
-    cache: HashMap<PathBuf, DynamicImage>,
+    //cache: HashMap<PathBuf, DynamicImage>,
+    pub cursor: usize,
 }
-
-// impl Job<DynamicImage> for DynamicImage {
-//     fn process(&mut self) -> DynamicImage {
-//         DynamicImage::from(
-//     }
-// }
 
 impl AssetCollection {
     pub fn new(paths: Vec<PathBuf>) -> Self {
         Self {
             assets: paths,
-            cache: HashMap::new(),
+            // cache: HashMap::new(),
+            cursor: 0,
         }
     }
-
-    pub fn get(&mut self, path: PathBuf) -> Result<DynamicImage> {
-        image::open(&path).map_err(|_| FBIError::Generic("yes".into()))
-    }
-
-    // pub fn get(&mut self, path: PathBuf) -> Result<&DynamicImage> {
-    //     if let Some(image) = self.cache.get(&path) {
-    //         Ok(image)
-    //     } else {
-    //         let image = image::open(&path).map_err(|_| FBIError::Generic("yes".into()))?;
-    //         self.cache.insert(path, image);
-    //         Ok(&image)
-    //     }
-    // }
 
     /// Get the next asset
-    pub fn next(&mut self) -> Result<PathBuf> {
-        if let Some(path) = self.assets.pop() {
-            return Ok(path);
-            //return image::open(path).map_err(|_| FBIError::Generic("yes".into()));
+    pub fn prev(&mut self) -> Option<&PathBuf> {
+        if self.cursor == 0 {
+            self.cursor = self.assets.len() - 1;
+        } else {
+            self.cursor -= 1;
         }
 
-        panic!("bad")
+        self.assets.get(self.cursor)
+    }
+
+    /// Get the next asset
+    pub fn next(&mut self) -> Option<&PathBuf> {
+        if self.cursor == self.assets.len() - 1 {
+            self.cursor = 0;
+        } else {
+            self.cursor += 1;
+        }
+
+        self.assets.get(self.cursor)
     }
 }
