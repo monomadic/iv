@@ -44,7 +44,12 @@ impl Window {
             .expect("winit failed to initialize window");
 
         let mut decorations = true;
+
+        // caches entire images
         let mut cache: HashMap<PathBuf, DynamicImage> = HashMap::new();
+
+        // thumbnail cache
+        let mut thumbnail_cache: HashMap<PathBuf, DynamicImage> = HashMap::new();
 
         let mut gallery_rows = 4;
 
@@ -89,8 +94,9 @@ impl Window {
 
                     let layout = if single_view {
                         let path = collection.current().unwrap();
-                        let image = cache.get(path).unwrap();
-                        crate::layout::render_single_view(image, view).expect("abc")
+                        let image = cache.get(path).expect("image not found in cache");
+                        crate::layout::render_single_view(image, view)
+                            .expect("failed to render single view")
                     } else {
                         let images: Vec<&DynamicImage> = collection
                             .assets
@@ -136,7 +142,27 @@ impl Window {
                             gallery_rows = 5;
                             window.request_redraw();
                         }
-                        VirtualKeyCode::Space => {
+                        VirtualKeyCode::Key4 => {
+                            gallery_rows = 6;
+                            window.request_redraw();
+                        }
+                        VirtualKeyCode::Key5 => {
+                            gallery_rows = 7;
+                            window.request_redraw();
+                        }
+                        VirtualKeyCode::Key6 => {
+                            gallery_rows = 8;
+                            window.request_redraw();
+                        }
+                        VirtualKeyCode::Key7 => {
+                            gallery_rows = 9;
+                            window.request_redraw();
+                        }
+                        VirtualKeyCode::Key8 => {
+                            gallery_rows = 10;
+                            window.request_redraw();
+                        }
+                        VirtualKeyCode::Space | VirtualKeyCode::Return => {
                             single_view = !single_view;
                             window.request_redraw();
                         }

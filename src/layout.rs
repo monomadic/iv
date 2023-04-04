@@ -47,11 +47,22 @@ pub fn render_index_view(
         let current_row = (i as u32) / columns;
         let current_column = (i as u32) % columns;
 
-        let left_padding = current_column * (row_height);
-        let top_padding = current_row * (row_height);
+        let mut left_offset = current_column * (row_height);
+        let mut top_offset = current_row * (row_height);
+
+        // center image
+        if image.height() > image.width() {
+            // center horizontally
+            left_offset = left_offset + ((col_width - resized_image.width()) / 2);
+        } else {
+            // center vertically
+            top_offset = top_offset + ((col_width - resized_image.height()) / 2);
+        }
+
+        // apply padding here
 
         surface
-            .copy_from(&resized_image, left_padding, top_padding)
+            .copy_from(&resized_image, left_offset, top_offset)
             .map_err(|e| FBIError::Generic(e.to_string()))?;
     }
 
@@ -100,20 +111,36 @@ pub fn render_single_view(image: &DynamicImage, mut surface: DynamicImage) -> Re
 
 pub fn image_to_u32(img: DynamicImage) -> Vec<u32> {
     let (img_width, img_height) = img.dimensions();
-    let mut buffer: Vec<u32> = vec![];
-    buffer.resize((img_width * img_height) as usize, 0);
+    let img_rgba = img.into_rgba8();
+    let mut buffer: Vec<u32> = Vec::with_capacity((img_width * img_height) as usize);
 
-    for y in 0..img_height {
-        for x in 0..img_width {
-            let pixel = img.get_pixel(x, y);
-            let rgba = pixel.0;
-            let color = ((rgba[3] as u32) << 24)
-                | ((rgba[0] as u32) << 16)
-                | ((rgba[1] as u32) << 8)
-                | (rgba[2] as u32);
-            buffer[y as usize * img_width as usize + x as usize] = color;
-        }
+    for pixel in img_rgba.chunks_exact(4) {
+        let color = ((pixel[3] as u32) << 24)
+            | ((pixel[0] as u32) << 16)
+            | ((pixel[1] as u32) << 8)
+            | (pixel[2] as u32);
+        buffer.push(color);
     }
 
     buffer
 }
+
+// pub fn image_to_u32(img: DynamicImage) -> Vec<u32> {
+//     let (img_width, img_height) = img.dimensions();
+//     let mut buffer: Vec<u32> = vec![];
+//     buffer.resize((img_width * img_height) as usize, 0);
+//
+//     for y in 0..img_height {
+//         for x in 0..img_width {
+//             let pixel = img.get_pixel(x, y);
+//             let rgba = pixel.0;
+//             let color = ((rgba[3] as u32) << 24)
+//                 | ((rgba[0] as u32) << 16)
+//                 | ((rgba[1] as u32) << 8)
+//                 | (rgba[2] as u32);
+//             buffer[y as usize * img_width as usize + x as usize] = color;
+//         }
+//     }
+//
+//     buffer
+// }
