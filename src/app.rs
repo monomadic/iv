@@ -7,6 +7,7 @@ use crate::{layout::LayoutState, AssetCollection};
 pub struct AppState {
     pub assets: AssetCollection,
     pub layout: LayoutState,
+    pub rows: u32,
 }
 
 impl AppState {
@@ -21,7 +22,11 @@ impl AppState {
         };
         let assets = AssetCollection::new(path)?;
 
-        Ok(AppState { assets, layout })
+        Ok(AppState {
+            assets,
+            layout,
+            rows: 6,
+        })
     }
 
     pub fn toggle_layout(&mut self) {
@@ -30,6 +35,19 @@ impl AppState {
             SingleView => MultiView,
             MultiView => SingleView,
         };
+    }
+
+    pub fn up(&mut self) {
+        self.assets.prev();
+    }
+    pub fn down(&mut self) {
+        self.assets.next();
+    }
+    pub fn left(&mut self) {
+        self.assets.prev();
+    }
+    pub fn right(&mut self) {
+        self.assets.next();
     }
 
     pub fn preload() {}

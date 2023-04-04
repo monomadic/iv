@@ -45,11 +45,7 @@ impl Window {
         let mut cache: HashMap<PathBuf, DynamicImage> = HashMap::new();
 
         // thumbnail cache
-        let mut thumbnail_cache: HashMap<PathBuf, DynamicImage> = HashMap::new();
-
-        let mut gallery_rows = 4;
-
-        let mut single_view = false;
+        // let mut thumbnail_cache: HashMap<PathBuf, DynamicImage> = HashMap::new();
 
         // go fullscreen
         window.set_simple_fullscreen(true);
@@ -107,7 +103,7 @@ impl Window {
                             crate::layout::render_index_view(
                                 images,
                                 view,
-                                gallery_rows,
+                                appstate.rows,
                                 appstate.assets.cursor,
                             )
                             .expect("index view error")
@@ -131,35 +127,35 @@ impl Window {
                     } => match virtual_code {
                         Escape | Q => control_flow.set_exit(),
                         VirtualKeyCode::Key1 => {
-                            gallery_rows = 3;
+                            appstate.rows = 3;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key2 => {
-                            gallery_rows = 4;
+                            appstate.rows = 4;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key3 => {
-                            gallery_rows = 5;
+                            appstate.rows = 5;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key4 => {
-                            gallery_rows = 6;
+                            appstate.rows = 6;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key5 => {
-                            gallery_rows = 7;
+                            appstate.rows = 7;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key6 => {
-                            gallery_rows = 8;
+                            appstate.rows = 8;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key7 => {
-                            gallery_rows = 9;
+                            appstate.rows = 9;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key8 => {
-                            gallery_rows = 10;
+                            appstate.rows = 10;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Space | VirtualKeyCode::Return => {
@@ -173,12 +169,20 @@ impl Window {
                         //     appstate.toggle_layout();
                         //     window.set_decorations(true);
                         // }
-                        VirtualKeyCode::K | VirtualKeyCode::H => {
-                            appstate.assets.prev();
+                        VirtualKeyCode::H | VirtualKeyCode::Left => {
+                            appstate.left();
                             window.request_redraw();
                         }
-                        VirtualKeyCode::J | VirtualKeyCode::L => {
-                            appstate.assets.next();
+                        VirtualKeyCode::J | VirtualKeyCode::Down => {
+                            appstate.down();
+                            window.request_redraw();
+                        }
+                        VirtualKeyCode::K | VirtualKeyCode::Up => {
+                            appstate.up();
+                            window.request_redraw();
+                        }
+                        VirtualKeyCode::L | VirtualKeyCode::Right => {
+                            appstate.right();
                             window.request_redraw();
                         }
                         _ => (),
