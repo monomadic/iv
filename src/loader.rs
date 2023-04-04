@@ -7,9 +7,7 @@ use std::path::PathBuf;
 
 // TODO: return a cursor position, etc
 
-pub fn parse_arg(arg: &str) -> Result<Vec<PathBuf>> {
-    let path = PathBuf::from(arg);
-
+pub fn parse_arg(path: PathBuf) -> Result<Vec<PathBuf>> {
     if path.is_file() {
         // todo: cycle with position etc
         return Ok(vec![path]);

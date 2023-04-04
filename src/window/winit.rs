@@ -1,7 +1,7 @@
 // https://github.com/parasyte/pixels/blob/main/examples/minimal-winit/src/main.rs
 // use fast_image_resize as fir;
 
-use crate::prelude::*;
+use crate::{app::AppState, prelude::*};
 use image::DynamicImage;
 use softbuffer::GraphicsContext;
 use std::{collections::HashMap, path::PathBuf, sync::mpsc, thread};
@@ -13,8 +13,6 @@ use winit::{
     event_loop::EventLoop,
     window::WindowBuilder,
 };
-
-use crate::AssetCollection;
 
 pub struct Window;
 
@@ -35,7 +33,7 @@ impl UpdateState {
 }
 
 impl Window {
-    pub fn new(mut collection: AssetCollection) -> Result<()> {
+    pub fn new(mut appstate: AppState) -> Result<()> {
         let event_loop = EventLoop::new();
         let window = WindowBuilder::new()
             .with_title("fbi")
@@ -74,7 +72,7 @@ impl Window {
 
         // preload images in a new thread
         {
-            let collection = collection.clone();
+            let collection = appstate.assets.clone();
             thread::spawn(move || {
                 for path in collection.assets {
                     preload_tx.send(UpdateState::load(path)).unwrap();
@@ -93,12 +91,13 @@ impl Window {
                     let view = DynamicImage::new_rgb8(width as u32, height as u32);
 
                     let layout = if single_view {
-                        let path = collection.current().unwrap();
+                        let path = appstate.assets.current().unwrap();
                         let image = cache.get(path).expect("image not found in cache");
                         crate::layout::render_single_view(image, view)
                             .expect("failed to render single view")
                     } else {
-                        let images: Vec<&DynamicImage> = collection
+                        let images: Vec<&DynamicImage> = appstate
+                            .assets
                             .assets
                             .iter()
                             .flat_map(|path| cache.get(path))
@@ -109,7 +108,7 @@ impl Window {
                             images,
                             view,
                             gallery_rows,
-                            collection.cursor,
+                            appstate.assets.cursor,
                         )
                         .expect("index view error")
                     };
@@ -174,11 +173,11 @@ impl Window {
                             window.set_decorations(decorations);
                         }
                         VirtualKeyCode::K | VirtualKeyCode::H => {
-                            collection.prev();
+                            appstate.assets.prev();
                             window.request_redraw();
                         }
                         VirtualKeyCode::J | VirtualKeyCode::L => {
-                            collection.next();
+                            appstate.assets.next();
                             window.request_redraw();
                         }
                         _ => (),

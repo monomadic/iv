@@ -12,6 +12,7 @@ mod prelude;
 mod single_view;
 mod window;
 
+use app::AppState;
 pub use collection::simple::AssetCollection;
 pub(crate) use window::Window;
 
@@ -19,15 +20,10 @@ use crate::prelude::*;
 use std::env;
 
 fn main() -> Result<()> {
-    // deal with cli
+    // parse args
     let path = env::args().nth(1).unwrap_or("assets".into());
-    let paths = loader::parse_arg(&path)?;
-
-    //println!("paths: {:?}", &paths);
-
-    // asset cache
-    let collection = AssetCollection::new(paths);
-
+    // init state
+    let appstate = AppState::new(path)?;
     // show window
-    Window::new(collection)
+    Window::new(appstate)
 }

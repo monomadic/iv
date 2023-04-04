@@ -75,7 +75,6 @@ pub fn render_multi_view(
     rows: u32,
 ) -> Result<DynamicImage> {
     let row_height = surface.height() / rows;
-    // let surface_width = surface.width();
 
     for (i, image) in images.iter().enumerate() {
         let image = image.resize(row_height, row_height, FilterType::Lanczos3);
@@ -124,23 +123,3 @@ pub fn image_to_u32(img: DynamicImage) -> Vec<u32> {
 
     buffer
 }
-
-// pub fn image_to_u32(img: DynamicImage) -> Vec<u32> {
-//     let (img_width, img_height) = img.dimensions();
-//     let mut buffer: Vec<u32> = vec![];
-//     buffer.resize((img_width * img_height) as usize, 0);
-//
-//     for y in 0..img_height {
-//         for x in 0..img_width {
-//             let pixel = img.get_pixel(x, y);
-//             let rgba = pixel.0;
-//             let color = ((rgba[3] as u32) << 24)
-//                 | ((rgba[0] as u32) << 16)
-//                 | ((rgba[1] as u32) << 8)
-//                 | (rgba[2] as u32);
-//             buffer[y as usize * img_width as usize + x as usize] = color;
-//         }
-//     }
-//
-//     buffer
-// }

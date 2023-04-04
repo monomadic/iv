@@ -1,20 +1,21 @@
+use crate::prelude::*;
 use std::path::PathBuf;
 
 #[derive(Default, Clone)]
 pub struct AssetCollection {
-    // assets: CycleVec<PathBuf>,
     pub assets: Vec<PathBuf>,
-    //cache: HashMap<PathBuf, DynamicImage>,
     pub cursor: usize,
 }
 
 impl AssetCollection {
-    pub fn new(paths: Vec<PathBuf>) -> Self {
-        Self {
+    pub fn new(path: PathBuf) -> Result<Self> {
+        // TODO: move logic for path decisions + cursor decisions here
+        let paths = crate::loader::parse_arg(path)?;
+
+        Ok(AssetCollection {
             assets: paths,
-            // cache: HashMap::new(),
             cursor: 0,
-        }
+        })
     }
 
     pub fn current(&self) -> Option<&PathBuf> {
