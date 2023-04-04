@@ -92,10 +92,20 @@ impl Window {
                         let image = cache.get(path).unwrap();
                         crate::layout::render_single_view(image, view).expect("abc")
                     } else {
-                        let images: Vec<&DynamicImage> = cache.iter().map(|(_k, v)| v).collect();
+                        let images: Vec<&DynamicImage> = collection
+                            .assets
+                            .iter()
+                            .flat_map(|path| cache.get(path))
+                            .collect();
+
                         // crate::layout::render_multi_view(images, view, gallery_rows).expect("abc")
-                        crate::layout::render_index_view(images, view, gallery_rows)
-                            .expect("index view error")
+                        crate::layout::render_index_view(
+                            images,
+                            view,
+                            gallery_rows,
+                            collection.cursor,
+                        )
+                        .expect("index view error")
                     };
 
                     screen_buffer = crate::layout::image_to_u32(layout);

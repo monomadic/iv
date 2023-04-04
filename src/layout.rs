@@ -18,6 +18,7 @@ pub fn render_index_view(
     images: Vec<&DynamicImage>,
     mut surface: DynamicImage,
     columns: u32,
+    cursor: usize,
 ) -> Result<DynamicImage> {
     let col_width = surface.width() / columns;
     let row_height = col_width; // square grid
@@ -26,26 +27,28 @@ pub fn render_index_view(
                                                                              // render half-images
 
     // maximum amount of images that can fit on the screen
-    let max_images = rows * columns;
-
-    println!("{}, {}, {}", rows, columns, max_images);
+    let max_images = (rows * columns) as usize;
 
     // let horizontal_spacing = (surface.width() - (columns * row_height)) / (columns + 1);
     // let vertical_spacing = (surface.height() - (rows * row_height)) / (rows + 1);
 
     for (i, image) in images.iter().enumerate() {
-        println!("i:{}", i);
-        if i as u32 >= max_images {
+        if i >= max_images {
             break;
         }
 
-        let resized_image = image.resize(row_height, row_height, FilterType::Lanczos3);
+        let mut resized_image = image.resize(row_height, row_height, FilterType::Lanczos3);
+
+        // if image is currently selected
+        if i == cursor {
+            resized_image = resized_image.brighten(30);
+        }
 
         let current_row = (i as u32) / columns;
         let current_column = (i as u32) % columns;
 
         let left_padding = current_column * (row_height);
-        let top_padding = (current_row * (row_height));
+        let top_padding = current_row * (row_height);
 
         surface
             .copy_from(&resized_image, left_padding, top_padding)
