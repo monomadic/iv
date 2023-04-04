@@ -1,7 +1,7 @@
 // https://github.com/parasyte/pixels/blob/main/examples/minimal-winit/src/main.rs
 // use fast_image_resize as fir;
 
-use crate::{app::AppState, prelude::*};
+use crate::{app::AppState, layout::LayoutState, prelude::*};
 use image::DynamicImage;
 use softbuffer::GraphicsContext;
 use std::{collections::HashMap, path::PathBuf, sync::mpsc, thread};
@@ -36,12 +36,10 @@ impl Window {
     pub fn new(mut appstate: AppState) -> Result<()> {
         let event_loop = EventLoop::new();
         let window = WindowBuilder::new()
-            .with_title("fbi")
+            .with_title("iV")
             .with_decorations(false)
             .build(&event_loop)
             .expect("winit failed to initialize window");
-
-        let mut decorations = true;
 
         // caches entire images
         let mut cache: HashMap<PathBuf, DynamicImage> = HashMap::new();
@@ -90,27 +88,30 @@ impl Window {
                     // create a screen-sized dynamic view
                     let view = DynamicImage::new_rgb8(width as u32, height as u32);
 
-                    let layout = if single_view {
-                        let path = appstate.assets.current().unwrap();
-                        let image = cache.get(path).expect("image not found in cache");
-                        crate::layout::render_single_view(image, view)
-                            .expect("failed to render single view")
-                    } else {
-                        let images: Vec<&DynamicImage> = appstate
-                            .assets
-                            .assets
-                            .iter()
-                            .flat_map(|path| cache.get(path))
-                            .collect();
+                    let layout = match appstate.layout {
+                        LayoutState::SingleView => {
+                            let path = appstate.assets.current().unwrap();
+                            let image = cache.get(path).expect("image not found in cache");
+                            crate::layout::render_single_view(image, view)
+                                .expect("failed to render single view")
+                        }
+                        LayoutState::MultiView => {
+                            let images: Vec<&DynamicImage> = appstate
+                                .assets
+                                .assets
+                                .iter()
+                                .flat_map(|path| cache.get(path))
+                                .collect();
 
-                        // crate::layout::render_multi_view(images, view, gallery_rows).expect("abc")
-                        crate::layout::render_index_view(
-                            images,
-                            view,
-                            gallery_rows,
-                            appstate.assets.cursor,
-                        )
-                        .expect("index view error")
+                            // crate::layout::render_multi_view(images, view, gallery_rows).expect("abc")
+                            crate::layout::render_index_view(
+                                images,
+                                view,
+                                gallery_rows,
+                                appstate.assets.cursor,
+                            )
+                            .expect("index view error")
+                        }
                     };
 
                     screen_buffer = crate::layout::image_to_u32(layout);
@@ -162,16 +163,16 @@ impl Window {
                             window.request_redraw();
                         }
                         VirtualKeyCode::Space | VirtualKeyCode::Return => {
-                            single_view = !single_view;
+                            appstate.toggle_layout();
                             window.request_redraw();
                         }
                         VirtualKeyCode::F => {
                             window.set_simple_fullscreen(!window.simple_fullscreen());
                         }
-                        VirtualKeyCode::D => {
-                            decorations = !decorations;
-                            window.set_decorations(decorations);
-                        }
+                        // VirtualKeyCode::D => {
+                        //     appstate.toggle_layout();
+                        //     window.set_decorations(true);
+                        // }
                         VirtualKeyCode::K | VirtualKeyCode::H => {
                             appstate.assets.prev();
                             window.request_redraw();

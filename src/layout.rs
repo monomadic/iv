@@ -102,13 +102,13 @@ pub fn render_single_view(image: &DynamicImage, mut surface: DynamicImage) -> Re
     let left_offset = surface_width / 2 - image.width() / 2;
 
     surface
-        .copy_from(&image, left_offset as u32, 0)
+        .copy_from(&image, left_offset, 0)
         .map_err(|e| FBIError::Generic(e.to_string()))?;
 
     Ok(surface)
 }
 
-pub fn image_to_u32(img: DynamicImage) -> Vec<u32> {
+pub fn _image_to_u32(img: DynamicImage) -> Vec<u32> {
     let (img_width, img_height) = img.dimensions();
     let img_rgba = img.into_rgba8();
     let mut buffer: Vec<u32> = Vec::with_capacity((img_width * img_height) as usize);
@@ -122,4 +122,16 @@ pub fn image_to_u32(img: DynamicImage) -> Vec<u32> {
     }
 
     buffer
+}
+
+pub fn image_to_u32(img: DynamicImage) -> Vec<u32> {
+    img.into_rgba8()
+        .chunks_exact(4)
+        .map(|pixel| {
+            ((pixel[3] as u32) << 24)
+                | ((pixel[0] as u32) << 16)
+                | ((pixel[1] as u32) << 8)
+                | (pixel[2] as u32)
+        })
+        .collect()
 }
