@@ -1,4 +1,4 @@
-# FBI: FrameBuffer Image Viewer
+# Fi: FrameBuffer Image Viewer
 
 Current status: shows images but largely not usable yet.
 

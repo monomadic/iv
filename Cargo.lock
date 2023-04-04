@@ -390,21 +390,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fbi"
-version = "0.1.0"
-dependencies = [
- "fast_image_resize",
- "glob",
- "image",
- "minifb",
- "multicache",
- "softbuffer",
- "thiserror",
- "walkdir",
- "winit",
-]
-
-[[package]]
 name = "flate2"
 version = "1.0.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -643,6 +628,21 @@ checksum = "1abeb7a0dd0f8181267ff8adc397075586500b81b28a73e8a0208b00fc170fb3"
 dependencies = [
  "libc",
  "windows-sys 0.45.0",
+]
+
+[[package]]
+name = "iv"
+version = "0.1.0"
+dependencies = [
+ "fast_image_resize",
+ "glob",
+ "image",
+ "minifb",
+ "multicache",
+ "softbuffer",
+ "thiserror",
+ "walkdir",
+ "winit",
 ]
 
 [[package]]

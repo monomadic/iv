@@ -46,7 +46,7 @@ impl Window {
         let mut decorations = true;
         let mut cache: HashMap<PathBuf, DynamicImage> = HashMap::new();
 
-        let mut gallery_rows = 3;
+        let mut gallery_rows = 4;
 
         let mut single_view = false;
 
@@ -93,7 +93,9 @@ impl Window {
                         crate::layout::render_single_view(image, view).expect("abc")
                     } else {
                         let images: Vec<&DynamicImage> = cache.iter().map(|(_k, v)| v).collect();
-                        crate::layout::render_multi_view(images, view, gallery_rows).expect("abc")
+                        // crate::layout::render_multi_view(images, view, gallery_rows).expect("abc")
+                        crate::layout::render_index_view(images, view, gallery_rows)
+                            .expect("index view error")
                     };
 
                     screen_buffer = crate::layout::image_to_u32(layout);
