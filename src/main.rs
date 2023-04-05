@@ -2,7 +2,6 @@
 
 mod app;
 mod buffer;
-// mod cache;
 mod collection;
 mod error;
 mod layout;
