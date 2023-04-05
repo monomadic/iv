@@ -18,7 +18,7 @@ pub fn render_index_view(
     images: Vec<&DynamicImage>,
     mut surface: DynamicImage,
     columns: u32,
-    cursor: usize,
+    selected: usize,
 ) -> Result<DynamicImage> {
     let col_width = surface.width() / columns;
     let row_height = col_width; // square grid
@@ -40,7 +40,7 @@ pub fn render_index_view(
         let mut resized_image = image.resize(row_height, row_height, FilterType::Lanczos3);
 
         // if image is currently selected
-        if i == cursor {
+        if i == selected {
             resized_image = resized_image.brighten(30);
         }
 

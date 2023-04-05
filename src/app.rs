@@ -7,7 +7,9 @@ use crate::{layout::LayoutState, AssetCollection};
 pub struct AppState {
     pub assets: AssetCollection,
     pub layout: LayoutState,
-    pub rows: u32,
+    pub rows: u32, // TODO: remove
+    pub cols: u32,
+    // renderer: Renderer,
 }
 
 impl AppState {
@@ -25,6 +27,7 @@ impl AppState {
         Ok(AppState {
             assets,
             layout,
+            cols: 10,
             rows: 6,
         })
     }
@@ -40,17 +43,24 @@ impl AppState {
     pub fn up(&mut self) {
         self.assets.prev();
     }
+
     pub fn down(&mut self) {
-        self.assets.next();
+        self.assets.advance(self.cols as usize);
     }
+
     pub fn left(&mut self) {
         self.assets.prev();
     }
+
     pub fn right(&mut self) {
         self.assets.next();
     }
 
-    pub fn preload() {}
+    /// load and cache images before use
+    pub fn precache() {}
+
+    // pub fn invalidate_cache() {}
+
     pub fn draw() -> Vec<u32> {
         todo!()
     }

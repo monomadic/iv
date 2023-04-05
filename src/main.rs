@@ -2,14 +2,13 @@
 
 mod app;
 mod buffer;
-mod cache;
+// mod cache;
 mod collection;
-mod cyclevec;
 mod error;
 mod layout;
 mod loader;
 mod prelude;
-mod single_view;
+mod renderer;
 mod window;
 
 use app::AppState;

@@ -9,7 +9,6 @@ pub struct AssetCollection {
 
 impl AssetCollection {
     pub fn new(path: PathBuf) -> Result<Self> {
-        // TODO: move logic for path decisions + cursor decisions here
         let paths = crate::loader::parse_arg(path)?;
 
         Ok(AssetCollection {
@@ -20,6 +19,14 @@ impl AssetCollection {
 
     pub fn current(&self) -> Option<&PathBuf> {
         self.assets.get(self.cursor)
+    }
+
+    pub fn set(&mut self, new: usize) {
+        if new <= self.assets.len() {
+            self.cursor = new;
+        } else {
+            panic!("index overflow");
+        }
     }
 
     /// Get the next asset
@@ -42,5 +49,20 @@ impl AssetCollection {
         }
 
         self.assets.get(self.cursor)
+    }
+
+    /// Advance by a set number of positions
+    /// TODO: remove
+    pub fn advance(&mut self, increment: usize) {
+        if self.assets.len() < increment {
+            return;
+        }
+        // for _ in 0..increment {
+        //     self.next();
+        // }
+        self.cursor += increment;
+        if self.cursor > self.assets.len() {
+            self.cursor = self.assets.len()
+        }
     }
 }

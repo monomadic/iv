@@ -54,6 +54,7 @@ impl Window {
 
         // create screen buffer (black screen)
         let mut screen_buffer = vec![0; width as usize * height as usize];
+        // let mut screen_buffer: Vec<u32> = Vec::with_capacity(width as usize * height as usize);
         let mut graphics_context = unsafe { GraphicsContext::new(&window, &window) }.unwrap();
 
         graphics_context.set_buffer(&screen_buffer, width as u16, height as u16);
@@ -92,6 +93,7 @@ impl Window {
                                 .expect("failed to render single view")
                         }
                         LayoutState::MultiView => {
+                            // get images from cache
                             let images: Vec<&DynamicImage> = appstate
                                 .assets
                                 .assets
@@ -195,9 +197,7 @@ impl Window {
             if let Ok(result) = rx.try_recv() {
                 // unwrap state result
                 let new_state = result.expect("image failed to render");
-
                 cache.insert(new_state.path, new_state.image);
-
                 window.request_redraw();
             }
         });

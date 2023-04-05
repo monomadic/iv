@@ -45,7 +45,7 @@ pub fn glob_from_arg(arg: &str) -> Result<Vec<PathBuf>> {
 }
 
 pub fn paths_from_arg(arg: &str) -> Result<Vec<PathBuf>> {
-    let mut files = glob_from_arg(arg)?;
+    let files = glob_from_arg(arg)?;
     if files.len() == 1 {
         // walkdir?
     }
@@ -53,7 +53,7 @@ pub fn paths_from_arg(arg: &str) -> Result<Vec<PathBuf>> {
     Ok(files)
 }
 
-pub fn get_surrounding_files(file: PathBuf) -> Result<Vec<PathBuf>> {
+pub fn get_surrounding_files(_file: PathBuf) -> Result<Vec<PathBuf>> {
     todo!()
 }
 
