@@ -19,7 +19,7 @@ use std::env;
 
 fn main() -> Result<()> {
     // parse args
-    let path = env::args().nth(1).unwrap_or("assets".into());
+    let path = env::args().nth(1).unwrap_or(".".into());
     // init state
     let appstate = AppState::new(path)?;
     // show window

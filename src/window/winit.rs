@@ -1,7 +1,7 @@
 // https://github.com/parasyte/pixels/blob/main/examples/minimal-winit/src/main.rs
 // use fast_image_resize as fir;
 
-use crate::{app::AppState, layout::LayoutState, prelude::*};
+use crate::{app::AppState, layout::LayoutState, prelude::*, renderer::SoftBufferRenderer};
 use image::DynamicImage;
 use softbuffer::GraphicsContext;
 use std::{collections::HashMap, path::PathBuf, sync::mpsc, thread};
@@ -57,6 +57,9 @@ impl Window {
         // let mut screen_buffer: Vec<u32> = Vec::with_capacity(width as usize * height as usize);
         let mut graphics_context = unsafe { GraphicsContext::new(&window, &window) }.unwrap();
 
+        // let mut renderer =
+        //     SoftBufferRenderer::new(width as usize, height as usize, graphics_context);
+
         graphics_context.set_buffer(&screen_buffer, width as u16, height as u16);
         //window.request_redraw();
 
@@ -101,11 +104,10 @@ impl Window {
                                 .flat_map(|path| cache.get(path))
                                 .collect();
 
-                            // crate::layout::render_multi_view(images, view, gallery_rows).expect("abc")
                             crate::layout::render_index_view(
                                 images,
                                 view,
-                                appstate.rows,
+                                appstate.cols,
                                 appstate.assets.cursor,
                             )
                             .expect("index view error")
@@ -129,35 +131,35 @@ impl Window {
                     } => match virtual_code {
                         Escape | Q => control_flow.set_exit(),
                         VirtualKeyCode::Key1 => {
-                            appstate.rows = 3;
+                            appstate.cols = 3;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key2 => {
-                            appstate.rows = 4;
+                            appstate.cols = 4;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key3 => {
-                            appstate.rows = 5;
+                            appstate.cols = 5;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key4 => {
-                            appstate.rows = 6;
+                            appstate.cols = 6;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key5 => {
-                            appstate.rows = 7;
+                            appstate.cols = 7;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key6 => {
-                            appstate.rows = 8;
+                            appstate.cols = 8;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key7 => {
-                            appstate.rows = 9;
+                            appstate.cols = 9;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key8 => {
-                            appstate.rows = 10;
+                            appstate.cols = 10;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Space | VirtualKeyCode::Return => {
@@ -167,10 +169,6 @@ impl Window {
                         VirtualKeyCode::F => {
                             window.set_simple_fullscreen(!window.simple_fullscreen());
                         }
-                        // VirtualKeyCode::D => {
-                        //     appstate.toggle_layout();
-                        //     window.set_decorations(true);
-                        // }
                         VirtualKeyCode::H | VirtualKeyCode::Left => {
                             appstate.left();
                             window.request_redraw();

@@ -7,7 +7,7 @@ pub struct SoftBufferRenderer {
 }
 
 impl SoftBufferRenderer {
-    fn new(width: usize, height: usize, ctx: GraphicsContext) -> Self {
+    pub fn new(width: usize, height: usize, ctx: GraphicsContext) -> Self {
         SoftBufferRenderer {
             // create screen buffer (black screen)
             buffer: vec![0; width as usize * height as usize],

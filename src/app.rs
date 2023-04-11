@@ -7,7 +7,7 @@ use crate::{layout::LayoutState, AssetCollection};
 pub struct AppState {
     pub assets: AssetCollection,
     pub layout: LayoutState,
-    pub rows: u32, // TODO: remove
+    //pub rows: u32, // TODO: remove
     pub cols: u32,
     // renderer: Renderer,
 }
@@ -28,7 +28,7 @@ impl AppState {
             assets,
             layout,
             cols: 10,
-            rows: 6,
+            //rows: 6,
         })
     }
 
