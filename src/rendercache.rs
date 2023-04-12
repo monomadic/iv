@@ -1,4 +1,4 @@
-use image::{imageops::FilterType, DynamicImage, RgbaImage};
+use image::{imageops::FilterType, DynamicImage, GenericImageView, RgbaImage};
 use pixels::Pixels;
 
 use crate::{app::AppState, layout::LayoutState};
@@ -16,7 +16,7 @@ impl RenderCache {
     }
 
     pub fn draw(&mut self, state: &AppState, pixels: &mut Pixels) {
-        let layout = match state.layout {
+        let _layout = match state.layout {
             LayoutState::SingleView => {
                 let path = state.assets.current().unwrap();
                 // let image = self
@@ -24,28 +24,31 @@ impl RenderCache {
                 //     .get(path)
                 //     .expect("image not found in cache");
                 let image = image::open(path).unwrap();
-                let image = image.resize(self.width, self.height, FilterType::Lanczos3);
-                self.render_single_view(&image.to_rgba8(), pixels);
+                self.render_single_view(&image, pixels);
             }
             LayoutState::MultiView => {
-                // let thumbs = state
-                //     .assets
-                //     .assets
-                //     .iter()
-                //     .map(|path| image::open(&path))
-                //     .collect();
+                let thumbs: Vec<DynamicImage> =
+                    state.assets.assets.iter().flat_map(image::open).collect();
 
                 todo!();
             }
         };
     }
 
-    pub fn render_single_view(&self, image: &RgbaImage, pixels: &mut Pixels) {
-        let frame = pixels.frame_mut();
+    pub fn render_single_view(&self, image: &DynamicImage, pixels: &mut Pixels) {
+        let resized_image = image.resize(self.width, self.height, FilterType::Lanczos3);
+        let (resized_width, resized_height) = resized_image.dimensions();
+        let x_offset = (self.width - resized_width) / 2;
+        let y_offset = (self.height - resized_height) / 2;
 
-        // align horizontal center by calculating left offset
-        // let left_offset = self.width / 2 - image.width() / 2;
+        let pixels_frame = pixels.frame_mut();
 
-        frame.copy_from_slice(&image);
+        for (x, y, pixel) in resized_image.pixels() {
+            let position = (((y + y_offset) * self.width) + (x + x_offset)) as usize;
+            let rgba = pixel.0;
+
+            // Each pixel has 4 channels (RGBA), so we multiply the position by 4.
+            pixels_frame[(position * 4)..(position * 4 + 4)].copy_from_slice(&rgba);
+        }
     }
 }
