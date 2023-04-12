@@ -1,8 +1,8 @@
-pub struct Layout {
+pub struct RenderCache {
     // cache
 }
 
-impl Layout {
+impl RenderCache {
     fn init() -> Self {
         // start thumbnail thread
         Self {}

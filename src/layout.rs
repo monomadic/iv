@@ -8,12 +8,6 @@ pub enum LayoutState {
     MultiView,
 }
 
-impl LayoutState {
-    pub fn draw(&self) -> Vec<u32> {
-        todo!()
-    }
-}
-
 pub fn render_index_view(
     images: Vec<&DynamicImage>,
     mut surface: DynamicImage,

@@ -7,6 +7,7 @@ mod error;
 mod layout;
 mod loader;
 mod prelude;
+mod rendercache;
 mod renderer;
 mod window;
 

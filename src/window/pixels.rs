@@ -1,15 +1,15 @@
 use pixels::{Pixels, SurfaceTexture};
 use winit::{
     event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent},
-    event_loop::EventLoop,
+    event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,
 };
 
 #[cfg(target_os = "macos")]
 use winit::platform::macos::WindowExtMacOS;
 
-use crate::app::AppState;
 use crate::prelude::*;
+use crate::{app::AppState, rendercache::RenderCache};
 
 pub struct Window;
 
@@ -25,14 +25,14 @@ impl Window {
         // go fullscreen
         window.set_simple_fullscreen(true);
 
+        let (width, height): (u32, u32) = window.inner_size().into();
+
         let mut pixels = {
-            let window_size = window.inner_size();
-            let surface_texture =
-                SurfaceTexture::new(window_size.width, window_size.height, &window);
-            Pixels::new(window_size.width, window_size.height, surface_texture).expect("pixels err")
+            let surface_texture = SurfaceTexture::new(width, height, &window);
+            Pixels::new(width, height, surface_texture).expect("pixels err")
         };
 
-        let layout = Layout::init();
+        let mut render = RenderCache::init(width, height);
 
         event_loop.run(move |event, _elwt, control_flow| {
             control_flow.set_wait();
@@ -41,7 +41,7 @@ impl Window {
 
             match event {
                 Event::RedrawRequested(window_id) if window_id == window.id() => {
-                    draw(&thumbnails, &mut pixels);
+                    render.draw(&appstate, &mut pixels);
 
                     if pixels.render().is_err() {
                         *control_flow = ControlFlow::Exit;

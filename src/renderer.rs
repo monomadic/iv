@@ -39,9 +39,8 @@ impl SoftBufferRenderer {
         // TODO: remove this alloc
         let view = DynamicImage::new_rgb8(self.width as u32, self.height as u32);
 
-        use LayoutState::*;
         let layout = match state.layout {
-            SingleView => {
+            LayoutState::SingleView => {
                 let path = state.assets.current().unwrap();
                 // let image = self
                 //     .image_cache
@@ -51,7 +50,7 @@ impl SoftBufferRenderer {
                 crate::layout::render_single_view(&image, view)
                     .expect("failed to render single view")
             }
-            MultiView => {
+            LayoutState::MultiView => {
                 todo!();
             }
         };
