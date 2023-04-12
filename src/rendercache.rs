@@ -61,10 +61,28 @@ impl RenderCache {
         }
 
         for (i, thumb) in thumbs.iter().enumerate() {
-            let x_offset = (i as u32 % cols) * thumb_width;
-            let y_offset = (i as u32 / cols) * thumb_height;
+            let thumb_aspect_ratio = thumb_width as f32 / thumb_height as f32;
+            let (image_width, image_height) = thumb.dimensions();
+            let image_aspect_ratio = image_width as f32 / image_height as f32;
 
-            for (x, y, pixel) in thumb.pixels() {
+            let (new_width, new_height) = if image_aspect_ratio > thumb_aspect_ratio {
+                (
+                    thumb_width,
+                    (thumb_width as f32 / image_aspect_ratio) as u32,
+                )
+            } else {
+                (
+                    (thumb_height as f32 * image_aspect_ratio) as u32,
+                    thumb_height,
+                )
+            };
+
+            let x_offset = (i as u32 % cols) * thumb_width + (thumb_width - new_width) / 2;
+            let y_offset = (i as u32 / cols) * thumb_height + (thumb_height - new_height) / 2;
+
+            let resized_thumb = thumb.resize(new_width, new_height, FilterType::Lanczos3);
+
+            for (x, y, pixel) in resized_thumb.pixels() {
                 let position = (((y + y_offset) * self.width) + (x + x_offset)) as usize;
                 let rgba = pixel.0;
 
@@ -77,7 +95,7 @@ impl RenderCache {
             // Draw border for the selected thumbnail
             if i == selected {
                 let border_color = [255, 255, 255, 255]; // White border
-                let border_thickness = 4;
+                let border_thickness = 10;
 
                 for y in 0..thumb_height {
                     for x in 0..thumb_width {
@@ -86,8 +104,10 @@ impl RenderCache {
                             || y < border_thickness
                             || y >= thumb_height - border_thickness
                         {
-                            let position =
-                                (((y + y_offset) * self.width) + (x + x_offset)) as usize;
+                            let position = (((y + (i as u32 / cols) * thumb_height) * self.width)
+                                + x
+                                + (i as u32 % cols) * thumb_width)
+                                as usize;
 
                             // Each pixel has 4 channels (RGBA), so we multiply the position by 4.
                             if position * 4 + 4 <= pixels_frame.len() {
