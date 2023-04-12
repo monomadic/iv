@@ -52,6 +52,8 @@ impl SoftBufferRenderer {
             }
             LayoutState::MultiView => {
                 todo!();
+                // let images = state.assets.assets.iter().flat_map(image::load).collect();
+                // crate::layout::render_multi_view(&images, view, 5).expect("")
             }
         };
 

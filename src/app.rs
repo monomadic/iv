@@ -41,6 +41,10 @@ impl AppState {
         };
     }
 
+    pub fn cursor(&self) -> usize {
+        self.assets.cursor
+    }
+
     pub fn up(&mut self) {
         self.assets.prev();
     }

@@ -4,7 +4,6 @@ use pixels::Pixels;
 use crate::{app::AppState, layout::LayoutState};
 
 pub struct RenderCache {
-    // cache
     width: u32,
     height: u32,
 }
@@ -27,10 +26,79 @@ impl RenderCache {
                 self.render_single_view_op(&image, pixels);
             }
             LayoutState::MultiView => {
-                // let thumbs: Vec<DynamicImage> =
-                //     state.assets.assets.iter().flat_map(image::open).collect();
+                // TODO: cache
+                let thumb_width = self.width / state.cols;
+
+                let thumbs: Vec<DynamicImage> = state
+                    .assets
+                    .assets
+                    .iter()
+                    .flat_map(image::open)
+                    .map(|i| i.thumbnail(thumb_width, thumb_width))
+                    .collect();
+                // render
+                self.render_grid_view(&thumbs, pixels, state.cols, state.cursor());
             }
         };
+    }
+
+    pub fn render_grid_view(
+        &self,
+        thumbs: &Vec<DynamicImage>,
+        pixels: &mut Pixels,
+        cols: u32,
+        selected: usize,
+    ) {
+        let thumb_width = thumbs.get(0).map(|t| t.width()).unwrap_or(0);
+        let thumb_height = thumbs.get(0).map(|t| t.height()).unwrap_or(0);
+        let rows = (thumbs.len() as u32 + cols - 1) / cols;
+
+        let pixels_frame = pixels.frame_mut();
+
+        // black image
+        for pixel in pixels_frame.chunks_exact_mut(4) {
+            pixel.copy_from_slice(&[0, 0, 0, 255]);
+        }
+
+        for (i, thumb) in thumbs.iter().enumerate() {
+            let x_offset = (i as u32 % cols) * thumb_width;
+            let y_offset = (i as u32 / cols) * thumb_height;
+
+            for (x, y, pixel) in thumb.pixels() {
+                let position = (((y + y_offset) * self.width) + (x + x_offset)) as usize;
+                let rgba = pixel.0;
+
+                // Each pixel has 4 channels (RGBA), so we multiply the position by 4.
+                if position * 4 + 4 <= pixels_frame.len() {
+                    pixels_frame[(position * 4)..(position * 4 + 4)].copy_from_slice(&rgba);
+                }
+            }
+
+            // Draw border for the selected thumbnail
+            if i == selected {
+                let border_color = [255, 255, 255, 255]; // White border
+                let border_thickness = 4;
+
+                for y in 0..thumb_height {
+                    for x in 0..thumb_width {
+                        if x < border_thickness
+                            || x >= thumb_width - border_thickness
+                            || y < border_thickness
+                            || y >= thumb_height - border_thickness
+                        {
+                            let position =
+                                (((y + y_offset) * self.width) + (x + x_offset)) as usize;
+
+                            // Each pixel has 4 channels (RGBA), so we multiply the position by 4.
+                            if position * 4 + 4 <= pixels_frame.len() {
+                                pixels_frame[(position * 4)..(position * 4 + 4)]
+                                    .copy_from_slice(&border_color);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     pub fn render_single_view(&self, image: &DynamicImage, pixels: &mut Pixels) {
