@@ -31,6 +31,7 @@ impl Window {
             let surface_texture = SurfaceTexture::new(width, height, &window);
             Pixels::new(width, height, surface_texture).expect("pixels err")
         };
+        pixels.clear_color(pixels::wgpu::Color::BLACK);
 
         let mut render = RenderCache::init(width, height);
 

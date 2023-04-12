@@ -18,7 +18,8 @@ impl AppState {
         // show gallery view if a directory was passed as an argument
         // otherwise show the single image fullscreen
         let layout = if path.is_dir() {
-            LayoutState::MultiView
+            // LayoutState::MultiView
+            LayoutState::SingleView
         } else {
             LayoutState::SingleView
         };
@@ -45,7 +46,8 @@ impl AppState {
     }
 
     pub fn down(&mut self) {
-        self.assets.advance(self.cols as usize);
+        //self.assets.advance(self.cols as usize);
+        self.assets.next();
     }
 
     pub fn left(&mut self) {
