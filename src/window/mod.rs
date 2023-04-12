@@ -1,4 +1,5 @@
 // mod minifb;
+mod pixels;
 mod winit;
 
-pub use self::winit::Window;
+pub use self::pixels::Window;

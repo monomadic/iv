@@ -1,36 +1,17 @@
-// https://github.com/parasyte/pixels/blob/main/examples/minimal-winit/src/main.rs
-// use fast_image_resize as fir;
-
-use crate::{app::AppState, prelude::*, renderer::SoftBufferRenderer};
-use image::DynamicImage;
-use softbuffer::GraphicsContext;
-use std::{collections::HashMap, path::PathBuf, sync::mpsc, thread};
-
-#[cfg(target_os = "macos")]
-use winit::platform::macos::WindowExtMacOS;
+use pixels::{Pixels, SurfaceTexture};
 use winit::{
     event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent},
     event_loop::EventLoop,
     window::WindowBuilder,
 };
 
+#[cfg(target_os = "macos")]
+use winit::platform::macos::WindowExtMacOS;
+
+use crate::app::AppState;
+use crate::prelude::*;
+
 pub struct Window;
-
-struct UpdateState {
-    image: DynamicImage,
-    path: PathBuf,
-}
-
-impl UpdateState {
-    fn load(path: PathBuf) -> Result<Self> {
-        image::open(&path)
-            .map(|image| UpdateState {
-                image,
-                path: path.clone(),
-            })
-            .map_err(|e| FBIError::Generic(format!("update state failure: {:?}, {:?}", path, e)))
-    }
-}
 
 impl Window {
     pub fn new(mut appstate: AppState) -> Result<()> {
@@ -41,39 +22,17 @@ impl Window {
             .build(&event_loop)
             .expect("winit failed to initialize window");
 
-        // caches entire images
-        let mut cache: HashMap<PathBuf, DynamicImage> = HashMap::new();
-
-        // thumbnail cache
-        // let mut thumbnail_cache: HashMap<PathBuf, DynamicImage> = HashMap::new();
-
         // go fullscreen
         window.set_simple_fullscreen(true);
 
-        let (width, height): (u16, u16) = window.inner_size().into();
+        let mut pixels = {
+            let window_size = window.inner_size();
+            let surface_texture =
+                SurfaceTexture::new(window_size.width, window_size.height, &window);
+            Pixels::new(window_size.width, window_size.height, surface_texture).expect("pixels err")
+        };
 
-        // create screen buffer (black screen)
-        //let mut screen_buffer = vec![0; width as usize * height as usize];
-        // let mut screen_buffer: Vec<u32> = Vec::with_capacity(width as usize * height as usize);
-        let graphics_context = unsafe { GraphicsContext::new(&window, &window) }.unwrap();
-
-        let mut renderer = SoftBufferRenderer::new(width, height, graphics_context);
-
-        //graphics_context.set_buffer(&screen_buffer, width as u16, height as u16);
-        //window.request_redraw();
-
-        let (tx, rx) = mpsc::channel();
-
-        // preload images in a new thread
-        let preload_tx = tx.clone();
-        {
-            let collection = appstate.assets.clone();
-            thread::spawn(move || {
-                for path in collection.assets {
-                    preload_tx.send(UpdateState::load(path)).unwrap();
-                }
-            });
-        }
+        let layout = Layout::init();
 
         event_loop.run(move |event, _elwt, control_flow| {
             control_flow.set_wait();
@@ -82,39 +41,12 @@ impl Window {
 
             match event {
                 Event::RedrawRequested(window_id) if window_id == window.id() => {
-                    // create a screen-sized dynamic view
-                    // let view = DynamicImage::new_rgb8(width as u32, height as u32);
+                    draw(&thumbnails, &mut pixels);
 
-                    // let layout = match appstate.layout {
-                    //     LayoutState::SingleView => {
-                    //         let path = appstate.assets.current().unwrap();
-                    //         let image = cache.get(path).expect("image not found in cache");
-                    //         crate::layout::render_single_view(image, view)
-                    //             .expect("failed to render single view")
-                    //     }
-                    //     LayoutState::MultiView => {
-                    //         // get images from cache
-                    //         let images: Vec<&DynamicImage> = appstate
-                    //             .assets
-                    //             .assets
-                    //             .iter()
-                    //             .flat_map(|path| cache.get(path))
-                    //             .collect();
-                    //
-                    //         crate::layout::render_index_view(
-                    //             images,
-                    //             view,
-                    //             appstate.cols,
-                    //             appstate.assets.cursor,
-                    //         )
-                    //         .expect("index view error")
-                    //     }
-                    // };
-
-                    //screen_buffer = crate::layout::image_to_u32(layout);
-                    //graphics_context.set_buffer(&screen_buffer, width as u16, height as u16);
-
-                    renderer.draw(&appstate);
+                    if pixels.render().is_err() {
+                        *control_flow = ControlFlow::Exit;
+                        return;
+                    }
                 }
 
                 Event::WindowEvent { event, .. } => match event {
@@ -189,13 +121,6 @@ impl Window {
                     _ => (),
                 },
                 _ => {}
-            }
-
-            if let Ok(result) = rx.try_recv() {
-                // unwrap state result
-                let new_state = result.expect("image failed to render");
-                cache.insert(new_state.path, new_state.image);
-                window.request_redraw();
             }
         });
     }
