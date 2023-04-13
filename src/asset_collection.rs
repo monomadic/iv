@@ -9,9 +9,15 @@ pub struct AssetCollection {
 
 impl AssetCollection {
     pub fn new<P: AsRef<Path>>(path: P) -> Result<Self> {
+        let images = get_images_from_directory(&path.as_ref())?;
+        let index = images
+            .iter()
+            .position(|p| p.as_path() == path.as_ref())
+            .unwrap_or(0);
+
         Ok(AssetCollection {
-            assets: get_images_from_directory(&path.as_ref())?,
-            cursor: 0,
+            assets: images,
+            cursor: index,
         })
     }
 
