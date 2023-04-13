@@ -1,5 +1,5 @@
 use crate::{asset_collection::AssetCollection, layout::LayoutState, prelude::*};
-use std::path::PathBuf;
+use std::path::Path;
 
 #[derive(Default)]
 pub struct AppState {
@@ -9,8 +9,8 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub fn new<P: Into<PathBuf>>(path: P) -> Result<Self> {
-        let path: PathBuf = path.into();
+    pub fn new<P: AsRef<Path>>(path: P) -> Result<Self> {
+        let path = path.as_ref();
         // show gallery view if a directory was passed as an argument
         // otherwise show the single image fullscreen
         let layout = if path.is_dir() {

@@ -1,5 +1,5 @@
 use crate::{loader::get_images_from_directory, prelude::*};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Default, Clone)]
 pub struct AssetCollection {
@@ -8,9 +8,9 @@ pub struct AssetCollection {
 }
 
 impl AssetCollection {
-    pub fn new(path: PathBuf) -> Result<Self> {
+    pub fn new<P: AsRef<Path>>(path: P) -> Result<Self> {
         Ok(AssetCollection {
-            assets: get_images_from_directory(&path)?,
+            assets: get_images_from_directory(&path.as_ref())?,
             cursor: 0,
         })
     }
