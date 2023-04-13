@@ -1,7 +1,5 @@
-use crate::prelude::*;
+use crate::{asset_collection::AssetCollection, layout::LayoutState, prelude::*};
 use std::path::PathBuf;
-
-use crate::layout::LayoutState;
 
 #[derive(Default)]
 pub struct AppState {

@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use image::{imageops::FilterType, DynamicImage, GenericImage, GenericImageView};
+use image::{imageops::FilterType, DynamicImage, GenericImage};
 
 #[derive(Default)]
 pub enum LayoutState {
@@ -18,7 +18,6 @@ pub fn render_index_view(
     let row_height = col_width; // square grid
 
     let rows = (surface.height() as f64 / row_height as f64).floor() as u32; // todo: use ceil,
-                                                                             // render half-images
 
     // maximum amount of images that can fit on the screen
     let max_images = (rows * columns) as usize;
