@@ -1,15 +1,13 @@
 use crate::prelude::*;
 use std::path::PathBuf;
 
-use crate::{layout::LayoutState, AssetCollection};
+use crate::layout::LayoutState;
 
 #[derive(Default)]
 pub struct AppState {
     pub assets: AssetCollection,
     pub layout: LayoutState,
-    //pub rows: u32, // TODO: remove
     pub cols: u32,
-    // renderer: Renderer,
 }
 
 impl AppState {
@@ -58,14 +56,5 @@ impl AppState {
 
     pub fn right(&mut self) {
         self.assets.next();
-    }
-
-    /// load and cache images before use
-    pub fn precache() {}
-
-    // pub fn invalidate_cache() {}
-
-    pub fn draw() -> Vec<u32> {
-        todo!()
     }
 }

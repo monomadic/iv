@@ -1,28 +1,21 @@
 #![allow(dead_code)]
 
 mod app;
-mod buffer;
-mod collection;
+mod asset_collection;
 mod error;
 mod layout;
 mod loader;
 mod prelude;
 mod rendercache;
-mod renderer;
 mod window;
 
-use app::AppState;
-pub use collection::simple::AssetCollection;
-pub(crate) use window::Window;
-
 use crate::prelude::*;
-use std::env;
 
 fn main() -> Result<()> {
     // parse args
-    let path = env::args().nth(1).unwrap_or(".".into());
+    let path = std::env::args().nth(1).unwrap_or(".".into());
     // init state
-    let appstate = AppState::new(path)?;
+    let appstate = app::AppState::new(path)?;
     // show window
-    Window::new(appstate)
+    window::Window::new(appstate)
 }

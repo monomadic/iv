@@ -1,4 +1,4 @@
-use image::{imageops::FilterType, DynamicImage, GenericImageView, RgbaImage};
+use image::{imageops::FilterType, DynamicImage, GenericImageView};
 use pixels::Pixels;
 
 use crate::{app::AppState, layout::LayoutState};
@@ -51,7 +51,7 @@ impl RenderCache {
     ) {
         let thumb_width = thumbs.get(0).map(|t| t.width()).unwrap_or(0);
         let thumb_height = thumbs.get(0).map(|t| t.height()).unwrap_or(0);
-        let rows = (thumbs.len() as u32 + cols - 1) / cols;
+        // let rows = (thumbs.len() as u32 + cols - 1) / cols;
 
         let pixels_frame = pixels.frame_mut();
 

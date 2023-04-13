@@ -1,98 +1,45 @@
-// loading strategy
-
-use walkdir::{DirEntry, WalkDir};
+// asset loading strategy
 
 use crate::prelude::*;
-use std::path::PathBuf;
 
-// TODO: return a cursor position, etc
+use image::io::Reader as ImageReader;
+use std::fs;
+use std::path::{Path, PathBuf};
 
-pub fn parse_arg(path: PathBuf) -> Result<Vec<PathBuf>> {
-    if path.is_file() {
-        // todo: cycle with position etc
-        return Ok(vec![path]);
-    }
-
+fn get_target_directory(path: &Path) -> Result<PathBuf> {
     if path.is_dir() {
-        return Ok(WalkDir::new(path)
-            .into_iter()
-            .filter_map(|e| e.ok())
-            .map(DirEntry::into_path)
-            .filter(is_supported_image)
-            .collect());
+        Ok(path.to_owned())
+    } else if path.is_file() {
+        path.parent()
+            .map(Path::to_owned)
+            .ok_or(FBIError::Static("Unable to get the parent directory"))
+    } else {
+        Err(FBIError::Static("Invalid path argument"))
     }
-
-    if !path.exists() {
-        panic!("bad path");
-    }
-
-    todo!()
 }
 
-fn is_supported_image(entry: &PathBuf) -> bool {
-    entry
-        .extension()
-        .and_then(|ext| ext.to_str())
-        .map(|ext| ["jpg", "jpeg", "png", "bmp", "tiff", "ico"].contains(&ext))
+fn is_image(path: &Path) -> bool {
+    ImageReader::open(path)
+        .ok()
+        .and_then(|reader| reader.format().map(|format| format.can_read()))
         .unwrap_or(false)
+}
+
+fn get_image_paths<P: AsRef<Path>>(dir: P) -> Result<Vec<PathBuf>> {
+    Ok(fs::read_dir(dir.as_ref())?
+        .filter_map(|result| result.ok())
+        .map(|entry| entry.path())
+        .filter(|path| is_image(&path))
+        .collect::<Vec<PathBuf>>())
+}
+
+pub fn get_images_from_directory(path: &Path) -> Result<Vec<PathBuf>> {
+    get_target_directory(path).and_then(get_image_paths)
 }
 
 pub fn glob_from_arg(arg: &str) -> Result<Vec<PathBuf>> {
     Ok(glob::glob(&arg)?
         .filter_map(|e| e.ok())
-        .filter(is_supported_image)
+        .filter(|path| is_image(&path))
         .collect())
-}
-
-pub fn paths_from_arg(arg: &str) -> Result<Vec<PathBuf>> {
-    let files = glob_from_arg(arg)?;
-    if files.len() == 1 {
-        // walkdir?
-    }
-
-    Ok(files)
-}
-
-pub fn get_surrounding_files(_file: PathBuf) -> Result<Vec<PathBuf>> {
-    todo!()
-}
-
-pub fn get_folder_for_file(path: &PathBuf) -> Option<PathBuf> {
-    if !path.exists() {
-        return None;
-    }
-    if path.is_file() {
-        // return surrounding dir
-        path.parent().map(PathBuf::from)
-    } else {
-        Some(path.clone())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_empty() {
-        assert!(glob_from_arg("").unwrap().is_empty())
-    }
-
-    #[test]
-    fn test_single_file() {
-        assert_eq!(glob_from_arg("assets/cyberpunk.jpg").unwrap().len(), 1);
-    }
-
-    #[test]
-    fn test_glob() {
-        assert_eq!(glob_from_arg("assets/*.*").unwrap().len(), 4);
-    }
-
-    #[test]
-    fn test_get_folder() {
-        assert_eq!(
-            get_folder_for_file(&PathBuf::from("assets/cyberpunk.jpg")),
-            Some(PathBuf::from("assets"))
-        );
-    }
 }

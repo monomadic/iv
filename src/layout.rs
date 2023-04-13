@@ -102,22 +102,6 @@ pub fn render_single_view(image: &DynamicImage, mut surface: DynamicImage) -> Re
     Ok(surface)
 }
 
-pub fn _image_to_u32(img: DynamicImage) -> Vec<u32> {
-    let (img_width, img_height) = img.dimensions();
-    let img_rgba = img.into_rgba8();
-    let mut buffer: Vec<u32> = Vec::with_capacity((img_width * img_height) as usize);
-
-    for pixel in img_rgba.chunks_exact(4) {
-        let color = ((pixel[3] as u32) << 24)
-            | ((pixel[0] as u32) << 16)
-            | ((pixel[1] as u32) << 8)
-            | (pixel[2] as u32);
-        buffer.push(color);
-    }
-
-    buffer
-}
-
 pub fn image_to_u32(img: DynamicImage) -> Vec<u32> {
     img.into_rgba8()
         .chunks_exact(4)

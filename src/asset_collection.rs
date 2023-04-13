@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::{loader::get_images_from_directory, prelude::*};
 use std::path::PathBuf;
 
 #[derive(Default, Clone)]
@@ -9,10 +9,8 @@ pub struct AssetCollection {
 
 impl AssetCollection {
     pub fn new(path: PathBuf) -> Result<Self> {
-        let paths = crate::loader::parse_arg(path)?;
-
         Ok(AssetCollection {
-            assets: paths,
+            assets: get_images_from_directory(&path)?,
             cursor: 0,
         })
     }
