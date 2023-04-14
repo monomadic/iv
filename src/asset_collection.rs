@@ -25,7 +25,7 @@ impl AssetCollection {
         self.assets.get(self.cursor)
     }
 
-    pub fn set(&mut self, new: usize) {
+    pub fn jump(&mut self, new: usize) {
         if new <= self.assets.len() {
             self.cursor = new;
         } else {
@@ -53,20 +53,5 @@ impl AssetCollection {
         }
 
         self.assets.get(self.cursor)
-    }
-
-    /// Advance by a set number of positions
-    /// TODO: remove
-    pub fn advance(&mut self, increment: usize) {
-        if self.assets.len() < increment {
-            return;
-        }
-        // for _ in 0..increment {
-        //     self.next();
-        // }
-        self.cursor += increment;
-        if self.cursor > self.assets.len() {
-            self.cursor = self.assets.len()
-        }
     }
 }

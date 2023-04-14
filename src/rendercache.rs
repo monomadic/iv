@@ -121,26 +121,26 @@ impl RenderCache {
         }
     }
 
-    pub fn render_single_view(&self, image: &DynamicImage, pixels: &mut Pixels) {
-        let resized_image = image.resize(self.width, self.height, FilterType::Lanczos3);
-        let (resized_width, resized_height) = resized_image.dimensions();
-        let x_offset = (self.width - resized_width) / 2;
-        let y_offset = (self.height - resized_height) / 2;
-
-        let pixels_frame = pixels.frame_mut();
-
-        // black image
-        for pixel in pixels_frame.chunks_exact_mut(4) {
-            pixel.copy_from_slice(&[0, 0, 0, 255]);
-        }
-
-        for (x, y, pixel) in resized_image.pixels() {
-            let position = (((y + y_offset) * self.width) + (x + x_offset)) as usize;
-            let rgba = pixel.0;
-            // Each pixel has 4 channels (RGBA), so we multiply the position by 4.
-            pixels_frame[(position * 4)..(position * 4 + 4)].copy_from_slice(&rgba);
-        }
-    }
+    // pub fn render_single_view(&self, image: &DynamicImage, pixels: &mut Pixels) {
+    //     let resized_image = image.resize(self.width, self.height, FilterType::Lanczos3);
+    //     let (resized_width, resized_height) = resized_image.dimensions();
+    //     let x_offset = (self.width - resized_width) / 2;
+    //     let y_offset = (self.height - resized_height) / 2;
+    //
+    //     let pixels_frame = pixels.frame_mut();
+    //
+    //     // black image
+    //     for pixel in pixels_frame.chunks_exact_mut(4) {
+    //         pixel.copy_from_slice(&[0, 0, 0, 255]);
+    //     }
+    //
+    //     for (x, y, pixel) in resized_image.pixels() {
+    //         let position = (((y + y_offset) * self.width) + (x + x_offset)) as usize;
+    //         let rgba = pixel.0;
+    //         // Each pixel has 4 channels (RGBA), so we multiply the position by 4.
+    //         pixels_frame[(position * 4)..(position * 4 + 4)].copy_from_slice(&rgba);
+    //     }
+    // }
 
     pub fn render_single_view_op(&self, image: &DynamicImage, pixels: &mut Pixels) {
         let (image_width, image_height) = image.dimensions();
