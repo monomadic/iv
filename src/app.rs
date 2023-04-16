@@ -44,8 +44,7 @@ impl AppState {
     }
 
     pub fn down(&mut self) {
-        //self.assets.advance(self.cols as usize);
-        self.assets.next();
+        self.assets.advance(self.cols as usize);
     }
 
     pub fn left(&mut self) {

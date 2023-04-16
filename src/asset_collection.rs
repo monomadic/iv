@@ -25,11 +25,12 @@ impl AssetCollection {
         self.assets.get(self.cursor)
     }
 
-    pub fn jump(&mut self, new: usize) {
+    pub fn advance(&mut self, inc: usize) {
+        let new = self.cursor + inc;
         if new <= self.assets.len() {
             self.cursor = new;
         } else {
-            panic!("index overflow");
+            self.cursor = self.assets.len();
         }
     }
 
