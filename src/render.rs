@@ -1,7 +1,7 @@
 use image::{imageops::FilterType, DynamicImage, GenericImageView};
 use pixels::Pixels;
 
-use crate::{app::AppState, layout::LayoutState};
+use crate::app::{AppState, LayoutState};
 
 pub struct RenderCache {
     width: u32,

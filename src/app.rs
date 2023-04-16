@@ -1,4 +1,4 @@
-use crate::{asset_collection::AssetCollection, layout::LayoutState, prelude::*};
+use crate::{collection::AssetCollection, layout::LayoutState, prelude::*};
 use std::path::Path;
 
 #[derive(Default)]
@@ -6,6 +6,13 @@ pub struct AppState {
     pub assets: AssetCollection,
     pub layout: LayoutState,
     pub cols: u32,
+}
+
+#[derive(Default)]
+pub enum LayoutState {
+    #[default]
+    SingleView,
+    MultiView,
 }
 
 impl AppState {

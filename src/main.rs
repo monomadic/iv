@@ -1,10 +1,9 @@
 mod app;
-mod asset_collection;
+mod collection;
 mod error;
-mod layout;
 mod loader;
 mod prelude;
-mod rendercache;
+mod render;
 mod window;
 
 use crate::prelude::*;

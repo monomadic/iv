@@ -9,7 +9,7 @@ use winit::{
 use winit::platform::macos::WindowExtMacOS;
 
 use crate::prelude::*;
-use crate::{app::AppState, rendercache::RenderCache};
+use crate::{app::AppState, render::RenderCache};
 
 pub struct Window;
 

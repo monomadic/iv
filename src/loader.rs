@@ -6,6 +6,17 @@ use image::io::Reader as ImageReader;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+pub fn get_images_from_directory(path: &Path) -> Result<Vec<PathBuf>> {
+    get_target_directory(path).and_then(get_image_paths)
+}
+
+pub fn glob_from_arg(arg: &str) -> Result<Vec<PathBuf>> {
+    Ok(glob::glob(&arg)?
+        .filter_map(|e| e.ok())
+        .filter(|path| is_image(&path))
+        .collect())
+}
+
 fn get_target_directory(path: &Path) -> Result<PathBuf> {
     if path.is_dir() {
         Ok(path.to_owned())
@@ -31,15 +42,4 @@ fn get_image_paths<P: AsRef<Path>>(dir: P) -> Result<Vec<PathBuf>> {
         .map(|entry| entry.path())
         .filter(|path| is_image(&path))
         .collect::<Vec<PathBuf>>())
-}
-
-pub fn get_images_from_directory(path: &Path) -> Result<Vec<PathBuf>> {
-    get_target_directory(path).and_then(get_image_paths)
-}
-
-pub fn glob_from_arg(arg: &str) -> Result<Vec<PathBuf>> {
-    Ok(glob::glob(&arg)?
-        .filter_map(|e| e.ok())
-        .filter(|path| is_image(&path))
-        .collect())
 }
