@@ -27,10 +27,10 @@ impl AssetCollection {
 
     pub fn advance(&mut self, inc: usize) {
         let new = self.cursor + inc;
-        if new <= self.assets.len() {
+        if new < self.assets.len() {
             self.cursor = new;
         } else {
-            self.cursor = self.assets.len();
+            self.cursor = self.assets.len() - 1;
         }
     }
 
