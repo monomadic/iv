@@ -1,4 +1,4 @@
-use crate::{collection::AssetCollection, layout::LayoutState, prelude::*};
+use crate::{collection::AssetCollection, prelude::*};
 use std::path::Path;
 
 #[derive(Default)]
