@@ -12,7 +12,8 @@ pub struct AppState {
 pub enum LayoutState {
     #[default]
     SingleView,
-    MultiView,
+    // Filmstrip,
+    IndexView,
 }
 
 impl AppState {
@@ -21,7 +22,7 @@ impl AppState {
         // show gallery view if a directory was passed as an argument
         // otherwise show the single image fullscreen
         let layout = if path.is_dir() {
-            LayoutState::MultiView
+            LayoutState::IndexView
         } else {
             LayoutState::SingleView
         };
@@ -37,8 +38,8 @@ impl AppState {
     pub fn toggle_layout(&mut self) {
         use LayoutState::*;
         self.layout = match self.layout {
-            SingleView => MultiView,
-            MultiView => SingleView,
+            SingleView => IndexView,
+            IndexView => SingleView,
         };
     }
 
@@ -47,7 +48,7 @@ impl AppState {
     }
 
     pub fn up(&mut self) {
-        self.assets.prev();
+        self.assets.decrement(self.cols as usize);
     }
 
     pub fn down(&mut self) {

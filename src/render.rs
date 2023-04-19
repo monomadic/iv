@@ -25,7 +25,7 @@ impl RenderCache {
                 let image = image::open(path).expect("image open");
                 self.render_single_view_op(&image, pixels);
             }
-            LayoutState::MultiView => {
+            LayoutState::IndexView => {
                 // TODO: cache
                 let thumb_width = self.width / state.cols;
 
@@ -37,12 +37,12 @@ impl RenderCache {
                     .map(|i| i.thumbnail(thumb_width, thumb_width))
                     .collect();
                 // render
-                self.render_grid_view(&thumbs, pixels, state.cols, state.cursor());
+                self.render_index_view(&thumbs, pixels, state.cols, state.cursor());
             }
         };
     }
 
-    pub fn render_grid_view(
+    pub fn render_index_view(
         &self,
         thumbs: &Vec<DynamicImage>,
         pixels: &mut Pixels,

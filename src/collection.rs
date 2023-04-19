@@ -34,6 +34,14 @@ impl AssetCollection {
         }
     }
 
+    pub fn decrement(&mut self, dec: usize) {
+        if self.cursor > dec {
+            self.cursor = self.cursor - dec;
+        } else {
+            self.cursor = 0;
+        }
+    }
+
     /// Get the next asset
     pub fn prev(&mut self) -> Option<&PathBuf> {
         if self.cursor == 0 {
