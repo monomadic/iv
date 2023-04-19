@@ -1,3 +1,6 @@
+use crate::prelude::*;
+use std::{collections::HashMap, path::PathBuf};
+
 use image::{imageops::FilterType, DynamicImage, GenericImageView};
 use pixels::Pixels;
 
@@ -6,12 +9,21 @@ use crate::app::{AppState, LayoutState};
 pub struct RenderCache {
     width: u32,
     height: u32,
+    thumbcache: HashMap<PathBuf, DynamicImage>,
+}
+
+fn process_image(path: &PathBuf, width: u32) -> Option<DynamicImage> {
+    image::open(path).map(|i| i.thumbnail(width, width)).ok()
 }
 
 impl RenderCache {
     pub fn init(width: u32, height: u32) -> Self {
         // start thumbnail processing on bg thread
-        Self { width, height }
+        Self {
+            width,
+            height,
+            thumbcache: HashMap::new(),
+        }
     }
 
     pub fn draw(&mut self, state: &AppState, pixels: &mut Pixels) {
@@ -33,9 +45,26 @@ impl RenderCache {
                     .assets
                     .assets
                     .iter()
-                    .flat_map(image::open)
-                    .map(|i| i.thumbnail(thumb_width, thumb_width))
+                    .filter_map(|path| {
+                        if let Some(cached_thumb) = self.thumbcache.get(path) {
+                            Some(cached_thumb.clone())
+                        } else {
+                            let processed_thumb = process_image(path, thumb_width)?;
+                            self.thumbcache
+                                .insert(path.clone(), processed_thumb.clone());
+                            Some(processed_thumb)
+                        }
+                    })
                     .collect();
+
+                // let thumbs: Vec<DynamicImage> = state
+                //     .assets
+                //     .assets
+                //     .iter()
+                //     .flat_map(image::open)
+                //     .map(|i| i.thumbnail(thumb_width, thumb_width))
+                //     .collect();
+
                 // render
                 self.render_index_view(&thumbs, pixels, state.cols, state.cursor());
             }
