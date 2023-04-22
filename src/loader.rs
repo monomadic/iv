@@ -10,7 +10,7 @@ pub fn get_images_from_directory(path: &Path) -> Result<Vec<PathBuf>> {
     get_target_directory(path).and_then(get_image_paths)
 }
 
-pub fn glob_from_arg(arg: &str) -> Result<Vec<PathBuf>> {
+pub fn get_images_from_glob(arg: &str) -> Result<Vec<PathBuf>> {
     Ok(glob::glob(&arg)?
         .filter_map(|e| e.ok())
         .filter(|path| is_image(&path))

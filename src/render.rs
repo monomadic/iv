@@ -1,4 +1,3 @@
-use crate::prelude::*;
 use std::{collections::HashMap, path::PathBuf};
 
 use image::{imageops::FilterType, DynamicImage, GenericImageView};
@@ -89,7 +88,10 @@ impl RenderCache {
             pixel.copy_from_slice(&[0, 0, 0, 255]);
         }
 
-        for (i, thumb) in thumbs.iter().enumerate() {
+        // the maximum amount of images displayed on screen
+        let images_max = cols as usize * (self.height as f64 / thumb_height as f64).ceil() as usize;
+
+        for (i, thumb) in thumbs.iter().take(images_max).enumerate() {
             let thumb_aspect_ratio = thumb_width as f32 / thumb_height as f32;
             let (image_width, image_height) = thumb.dimensions();
             let image_aspect_ratio = image_width as f32 / image_height as f32;
