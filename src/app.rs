@@ -6,6 +6,7 @@ pub struct AppState {
     pub assets: AssetCollection,
     pub layout: LayoutState,
     pub cols: u32,
+    pub rowskip: u32,
 }
 
 #[derive(Default)]
@@ -32,6 +33,7 @@ impl AppState {
             assets,
             layout,
             cols: 6,
+            rowskip: 0,
         })
     }
 
@@ -47,12 +49,25 @@ impl AppState {
         self.assets.cursor
     }
 
+    pub fn current_row(&self) -> u32 {
+        (self.assets.cursor as f64 / self.rows() as f64) as u32
+    }
+
+    pub fn rows(&self) -> usize {
+        (self.assets.assets.len() as f64 / self.cols as f64).ceil() as usize
+    }
+
     pub fn up(&mut self) {
         self.assets.decrement(self.cols as usize);
     }
 
     pub fn down(&mut self) {
         self.assets.advance(self.cols as usize);
+        print!("rows {} current_row {}", self.rows(), self.current_row());
+        // this should kick in around 50% down the screen
+        if self.current_row() > 2 {
+            self.rowskip = self.current_row() - 2;
+        }
     }
 
     pub fn left(&mut self) {

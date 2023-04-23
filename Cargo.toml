@@ -5,9 +5,9 @@ edition = "2021"
 
 [dependencies]
 glob = "0.3.1"
+# globset
 image = "0.24.5"
 multicache = "0.6.1"
-# pixels = "0.11.0"
 softbuffer = "0.2.0"
 thiserror = "1.0.38"
 winit = "0.28.2"

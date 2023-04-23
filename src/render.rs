@@ -65,7 +65,14 @@ impl RenderCache {
                 //     .collect();
 
                 // render
-                self.render_index_view(&thumbs, pixels, state.cols, 5, state.cursor());
+                self.render_index_view(
+                    &thumbs,
+                    pixels,
+                    state.cols,
+                    state.rowskip,
+                    5,
+                    state.cursor(),
+                );
             }
         };
     }
@@ -75,6 +82,7 @@ impl RenderCache {
         thumbs: &Vec<DynamicImage>,
         pixels: &mut Pixels,
         cols: u32,
+        rowskip: u32,
         padding: u32,
         selected: usize,
     ) {
@@ -95,7 +103,12 @@ impl RenderCache {
         // the maximum amount of images displayed on screen
         let images_max = cols as usize * (self.height as f64 / thumb_height as f64).ceil() as usize;
 
-        for (i, thumb) in thumbs.iter().take(images_max).enumerate() {
+        for (i, thumb) in thumbs
+            .iter()
+            .skip((rowskip * cols) as usize)
+            .take(images_max)
+            .enumerate()
+        {
             let thumb_aspect_ratio = 1.0; // thumb_width as f32 / thumb_height as f32;
             let (image_width, image_height) = thumb.dimensions();
             let image_aspect_ratio = image_width as f32 / image_height as f32;
@@ -135,7 +148,7 @@ impl RenderCache {
             }
 
             // Draw border for the selected thumbnail
-            if i == selected {
+            if i + (rowskip * cols) as usize == selected {
                 let border_color = [255, 255, 255, 255]; // White border
                 let border_thickness = 10;
 
