@@ -65,7 +65,7 @@ impl RenderCache {
                 //     .collect();
 
                 // render
-                self.render_index_view(&thumbs, pixels, state.cols, state.cursor());
+                self.render_index_view(&thumbs, pixels, state.cols, 5, state.cursor());
             }
         };
     }
@@ -75,11 +75,15 @@ impl RenderCache {
         thumbs: &Vec<DynamicImage>,
         pixels: &mut Pixels,
         cols: u32,
+        padding: u32,
         selected: usize,
     ) {
-        let thumb_width = thumbs.get(0).map(|t| t.width()).unwrap_or(0);
-        let thumb_height = thumbs.get(0).map(|t| t.height()).unwrap_or(0);
+        // let thumb_width = thumbs.get(0).map(|t| t.width()).unwrap_or(0);
+        // let thumb_height = thumbs.get(0).map(|t| t.height()).unwrap_or(0);
         // let rows = (thumbs.len() as u32 + cols - 1) / cols;
+
+        let thumb_width = self.width / cols;
+        let thumb_height = thumb_width;
 
         let pixels_frame = pixels.frame_mut();
 
@@ -92,7 +96,7 @@ impl RenderCache {
         let images_max = cols as usize * (self.height as f64 / thumb_height as f64).ceil() as usize;
 
         for (i, thumb) in thumbs.iter().take(images_max).enumerate() {
-            let thumb_aspect_ratio = thumb_width as f32 / thumb_height as f32;
+            let thumb_aspect_ratio = 1.0; // thumb_width as f32 / thumb_height as f32;
             let (image_width, image_height) = thumb.dimensions();
             let image_aspect_ratio = image_width as f32 / image_height as f32;
 
@@ -111,7 +115,14 @@ impl RenderCache {
             let x_offset = (i as u32 % cols) * thumb_width + (thumb_width - new_width) / 2;
             let y_offset = (i as u32 / cols) * thumb_height + (thumb_height - new_height) / 2;
 
-            let resized_thumb = thumb.resize(new_width, new_height, FilterType::Lanczos3);
+            let x_offset = x_offset + padding;
+            let y_offset = y_offset + padding;
+
+            let resized_thumb = thumb.resize(
+                new_width - (padding * 2),
+                new_height - (padding * 2),
+                FilterType::Lanczos3,
+            );
 
             for (x, y, pixel) in resized_thumb.pixels() {
                 let position = (((y + y_offset) * self.width) + (x + x_offset)) as usize;
