@@ -50,10 +50,10 @@ impl AppState {
     }
 
     pub fn current_row(&self) -> u32 {
-        (self.assets.cursor as f64 / self.rows() as f64) as u32
+        (self.assets.cursor as f64 / self.total_rows() as f64) as u32
     }
 
-    pub fn rows(&self) -> usize {
+    pub fn total_rows(&self) -> usize {
         (self.assets.assets.len() as f64 / self.cols as f64).ceil() as usize
     }
 
@@ -63,8 +63,7 @@ impl AppState {
 
     pub fn down(&mut self) {
         self.assets.advance(self.cols as usize);
-        print!("rows {} current_row {}", self.rows(), self.current_row());
-        // this should kick in around 50% down the screen
+        // this should kick in at the 2nd last visible row
         if self.current_row() > 2 {
             self.rowskip = self.current_row() - 2;
         }

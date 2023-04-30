@@ -95,7 +95,7 @@ impl RenderCache {
 
         let pixels_frame = pixels.frame_mut();
 
-        // black image
+        // black bg
         for pixel in pixels_frame.chunks_exact_mut(4) {
             pixel.copy_from_slice(&[0, 0, 0, 255]);
         }
@@ -131,6 +131,7 @@ impl RenderCache {
             let x_offset = x_offset + padding;
             let y_offset = y_offset + padding;
 
+            // TODO: remove this resize!
             let resized_thumb = thumb.resize(
                 new_width - (padding * 2),
                 new_height - (padding * 2),
