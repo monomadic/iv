@@ -63,8 +63,10 @@ impl AppState {
 
     pub fn down(&mut self) {
         self.assets.advance(self.cols as usize);
-        // this should kick in at the 2nd last visible row
-        if self.current_row() > 2 {
+
+        // shift entire canvas down
+        let rows = (self.cols as f32 / 3.0).floor() as u32; // assume 2:3 aspect
+        if self.current_row() > (rows + self.rowskip) {
             self.rowskip = self.current_row() - 2;
         }
     }

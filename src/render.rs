@@ -1,9 +1,12 @@
 use std::{collections::HashMap, path::PathBuf};
 
-use image::{imageops::FilterType, DynamicImage, GenericImageView};
+use image::{DynamicImage, GenericImageView};
 use pixels::Pixels;
 
-use crate::app::{AppState, LayoutState};
+use crate::{
+    app::{AppState, LayoutState},
+    config::Config,
+};
 
 pub struct RenderCache {
     width: u32,
@@ -11,7 +14,8 @@ pub struct RenderCache {
     thumbcache: HashMap<PathBuf, DynamicImage>,
 }
 
-fn process_image(path: &PathBuf, width: u32) -> Option<DynamicImage> {
+fn process_image(path: &PathBuf, width: u32, padding: u32) -> Option<DynamicImage> {
+    let width = width - (padding * 2);
     image::open(path).map(|i| i.thumbnail(width, width)).ok()
 }
 
@@ -25,7 +29,7 @@ impl RenderCache {
         }
     }
 
-    pub fn draw(&mut self, state: &AppState, pixels: &mut Pixels) {
+    pub fn draw(&mut self, state: &AppState, config: &Config, pixels: &mut Pixels) {
         match state.layout {
             LayoutState::SingleView => {
                 let path = state.assets.current().expect("no current");
@@ -37,7 +41,6 @@ impl RenderCache {
                 self.render_single_view_op(&image, pixels);
             }
             LayoutState::IndexView => {
-                // TODO: cache
                 let thumb_width = self.width / state.cols;
 
                 let thumbs: Vec<DynamicImage> = state
@@ -48,7 +51,8 @@ impl RenderCache {
                         if let Some(cached_thumb) = self.thumbcache.get(path) {
                             Some(cached_thumb.clone())
                         } else {
-                            let processed_thumb = process_image(path, thumb_width)?;
+                            let processed_thumb =
+                                process_image(path, thumb_width, config.thumbnail_padding)?;
                             self.thumbcache
                                 .insert(path.clone(), processed_thumb.clone());
                             Some(processed_thumb)
@@ -56,21 +60,13 @@ impl RenderCache {
                     })
                     .collect();
 
-                // let thumbs: Vec<DynamicImage> = state
-                //     .assets
-                //     .assets
-                //     .iter()
-                //     .flat_map(image::open)
-                //     .map(|i| i.thumbnail(thumb_width, thumb_width))
-                //     .collect();
-
                 // render
                 self.render_index_view(
                     &thumbs,
                     pixels,
                     state.cols,
                     state.rowskip,
-                    5,
+                    config.thumbnail_padding,
                     state.cursor(),
                 );
             }
@@ -131,14 +127,7 @@ impl RenderCache {
             let x_offset = x_offset + padding;
             let y_offset = y_offset + padding;
 
-            // TODO: remove this resize!
-            let resized_thumb = thumb.resize(
-                new_width - (padding * 2),
-                new_height - (padding * 2),
-                FilterType::Lanczos3,
-            );
-
-            for (x, y, pixel) in resized_thumb.pixels() {
+            for (x, y, pixel) in thumb.pixels() {
                 let position = (((y + y_offset) * self.width) + (x + x_offset)) as usize;
                 let rgba = pixel.0;
 

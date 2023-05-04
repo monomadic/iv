@@ -8,13 +8,13 @@ use winit::{
 #[cfg(target_os = "macos")]
 use winit::platform::macos::WindowExtMacOS;
 
-use crate::prelude::*;
 use crate::{app::AppState, render::RenderCache};
+use crate::{config::Config, prelude::*};
 
 pub struct Window;
 
 impl Window {
-    pub fn new(mut appstate: AppState) -> Result<()> {
+    pub fn new(mut appstate: AppState, config: Config) -> Result<()> {
         let event_loop = EventLoop::new();
         let window = WindowBuilder::new()
             .with_title("iV")
@@ -42,7 +42,7 @@ impl Window {
 
             match event {
                 Event::RedrawRequested(window_id) if window_id == window.id() => {
-                    render.draw(&appstate, &mut pixels);
+                    render.draw(&appstate, &config, &mut pixels);
 
                     if pixels.render().is_err() {
                         *control_flow = ControlFlow::Exit;
@@ -88,6 +88,16 @@ impl Window {
                         }
                         VirtualKeyCode::Key7 => {
                             appstate.cols = 9;
+                            window.request_redraw();
+                        }
+                        VirtualKeyCode::Minus => {
+                            appstate.cols += 1;
+                            window.request_redraw();
+                        }
+                        VirtualKeyCode::Equals => {
+                            if appstate.cols > 2 {
+                                appstate.cols -= 1;
+                            }
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key8 => {
