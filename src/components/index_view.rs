@@ -57,6 +57,7 @@ impl Component for IndexView {
             state.cols,
             state.rowskip,
             config.thumbnail_padding,
+            config.thumbnail_border_thickness,
             state.cursor(),
         );
     }
@@ -74,6 +75,7 @@ impl IndexView {
         cols: u32,
         rowskip: u32,
         padding: u32,
+        border_thickness: u32,
         selected: usize,
     ) {
         let thumb_width = self.width / cols;
@@ -129,7 +131,6 @@ impl IndexView {
             // Draw border for the selected thumbnail
             if i + (rowskip * cols) as usize == selected {
                 let border_color = [255, 255, 255, 255]; // White border
-                let border_thickness = 10;
 
                 for y in 0..thumb_height {
                     for x in 0..thumb_width {
