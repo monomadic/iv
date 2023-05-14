@@ -1,12 +1,12 @@
 use crate::components::Component;
 
-use super::GridComponent;
+use super::IndexView;
 
 #[derive(Default)]
 pub struct App {
     width: u32,
     height: u32,
-    grid: GridComponent,
+    grid: IndexView,
 }
 
 impl Component for App {

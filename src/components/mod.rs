@@ -3,10 +3,10 @@ use pixels::Pixels;
 use crate::{config::Config, state::AppState};
 
 mod app;
-mod grid;
+mod index_view;
 
 pub use app::App;
-pub use grid::GridComponent;
+pub use index_view::IndexView;
 
 pub trait Component {
     fn resize(&mut self, width: u32, height: u32);

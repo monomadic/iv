@@ -8,13 +8,13 @@ use crate::state::AppState;
 use super::Component;
 
 #[derive(Default)]
-pub struct GridComponent {
+pub struct IndexView {
     width: u32,
     height: u32,
-    thumbcache: HashMap<PathBuf, DynamicImage>,
+    thumbcache: HashMap<String, DynamicImage>,
 }
 
-impl Component for GridComponent {
+impl Component for IndexView {
     fn resize(&mut self, width: u32, height: u32) {
         self.width = width;
         self.height = height;
@@ -37,13 +37,14 @@ impl Component for GridComponent {
             .assets
             .iter()
             .filter_map(|path| {
-                if let Some(cached_thumb) = self.thumbcache.get(path) {
+                let hash = self.hash(&path, thumb_width);
+
+                if let Some(cached_thumb) = self.thumbcache.get(&hash) {
                     Some(cached_thumb.clone())
                 } else {
                     let processed_thumb =
                         process_image(path, thumb_width, config.thumbnail_padding)?;
-                    self.thumbcache
-                        .insert(path.clone(), processed_thumb.clone());
+                    self.thumbcache.insert(hash, processed_thumb.clone());
                     Some(processed_thumb)
                 }
             })
@@ -61,7 +62,11 @@ impl Component for GridComponent {
     }
 }
 
-impl GridComponent {
+impl IndexView {
+    fn hash(&self, path: &PathBuf, width: u32) -> String {
+        format!("{:?}#{}", path, width)
+    }
+
     pub fn render_index_view(
         &self,
         thumbs: &Vec<DynamicImage>,

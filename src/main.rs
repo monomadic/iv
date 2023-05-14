@@ -13,12 +13,16 @@ use crate::prelude::*;
 fn main() -> Result<()> {
     // default config
     let config = config::Config::default();
+
     // parse args
     let path = std::env::args().nth(1).unwrap_or(".".into());
+
     // init state
     let state = state::AppState::new(path)?;
-    // app component
+
+    // layout
     let app = components::App::default();
+
     // show window
     window::Window::new(state, app, config)
 }
