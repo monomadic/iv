@@ -51,10 +51,11 @@ impl AppState {
 
     pub fn down(&mut self) {
         self.assets.advance(self.cols as usize);
-
         // shift entire canvas down
         let rows = (self.cols as f32 / 3.0).floor() as u32; // assume 2:3 aspect
-        if self.current_row() > (rows + self.rowskip) {
+        if (rows + self.rowskip) < self.current_row()
+            && (rows + self.rowskip) != self.current_row() - 1
+        {
             self.rowskip = self.current_row() - 2;
         }
     }
@@ -62,18 +63,23 @@ impl AppState {
     pub fn up(&mut self) {
         self.assets.decrement(self.cols as usize);
         // shift entire canvas down
-        //let rows = (self.cols as f32 / 3.0).floor() as u32; // assume 2:3 aspect
-        if self.current_row() > 1 {
+        if self.rowskip > 0 {
             self.rowskip -= 1;
         }
     }
 
     pub fn left(&mut self) {
-        self.assets.prev();
+        if self.assets.cursor != 0 {
+            self.assets.prev();
+        }
     }
 
     pub fn right(&mut self) {
         self.assets.next();
+
+        if self.current_row() == 0 {
+            self.rowskip = 0;
+        }
     }
 
     // PRIVATE
