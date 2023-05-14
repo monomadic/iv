@@ -78,7 +78,6 @@ impl IndexView {
     ) {
         let thumb_width = self.width / cols;
         let thumb_height = thumb_width;
-
         let pixels_frame = pixels.frame_mut();
 
         // black bg
