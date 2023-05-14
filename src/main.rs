@@ -1,10 +1,11 @@
-mod app;
 mod collection;
+mod components;
 mod config;
 mod error;
+mod image;
 mod loader;
 mod prelude;
-mod render;
+mod state;
 mod window;
 
 use crate::prelude::*;
@@ -15,7 +16,9 @@ fn main() -> Result<()> {
     // parse args
     let path = std::env::args().nth(1).unwrap_or(".".into());
     // init state
-    let appstate = app::AppState::new(path)?;
+    let state = state::AppState::new(path)?;
+    // app component
+    let app = components::App::default();
     // show window
-    window::Window::new(appstate, config)
+    window::Window::new(state, app, config)
 }

@@ -6,7 +6,7 @@ pub struct AppState {
     pub assets: AssetCollection,
     pub layout: LayoutState,
     pub cols: u32,
-    pub rowskip: u32,
+    pub rowskip: u32, // not needed
 }
 
 #[derive(Default)]
@@ -49,18 +49,6 @@ impl AppState {
         self.assets.cursor
     }
 
-    pub fn current_row(&self) -> u32 {
-        (self.assets.cursor as f64 / self.total_rows() as f64) as u32
-    }
-
-    pub fn total_rows(&self) -> usize {
-        (self.assets.assets.len() as f64 / self.cols as f64).ceil() as usize
-    }
-
-    pub fn up(&mut self) {
-        self.assets.decrement(self.cols as usize);
-    }
-
     pub fn down(&mut self) {
         self.assets.advance(self.cols as usize);
 
@@ -71,11 +59,30 @@ impl AppState {
         }
     }
 
+    pub fn up(&mut self) {
+        self.assets.decrement(self.cols as usize);
+        // shift entire canvas down
+        //let rows = (self.cols as f32 / 3.0).floor() as u32; // assume 2:3 aspect
+        if self.current_row() > 1 {
+            self.rowskip -= 1;
+        }
+    }
+
     pub fn left(&mut self) {
         self.assets.prev();
     }
 
     pub fn right(&mut self) {
         self.assets.next();
+    }
+
+    // PRIVATE
+
+    fn current_row(&self) -> u32 {
+        (self.assets.cursor as f64 / self.total_rows() as f64) as u32
+    }
+
+    fn total_rows(&self) -> usize {
+        (self.assets.assets.len() as f64 / self.cols as f64).ceil() as usize
     }
 }

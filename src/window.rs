@@ -8,13 +8,17 @@ use winit::{
 #[cfg(target_os = "macos")]
 use winit::platform::macos::WindowExtMacOS;
 
-use crate::{app::AppState, render::RenderCache};
-use crate::{config::Config, prelude::*};
+use crate::state::AppState;
+use crate::{
+    components::{App, Component},
+    config::Config,
+    prelude::*,
+};
 
 pub struct Window;
 
 impl Window {
-    pub fn new(mut appstate: AppState, config: Config) -> Result<()> {
+    pub fn new(mut appstate: AppState, mut app: App, config: Config) -> Result<()> {
         let event_loop = EventLoop::new();
         let window = WindowBuilder::new()
             .with_title("iV")
@@ -26,14 +30,13 @@ impl Window {
         window.set_simple_fullscreen(true);
 
         let (width, height): (u32, u32) = window.inner_size().into();
+        app.resize(width, height);
 
         let mut pixels = {
             let surface_texture = SurfaceTexture::new(width, height, &window);
             Pixels::new(width, height, surface_texture).expect("pixels err")
         };
         pixels.clear_color(pixels::wgpu::Color::BLACK);
-
-        let mut render = RenderCache::init(width, height);
 
         event_loop.run(move |event, _elwt, control_flow| {
             control_flow.set_wait();
@@ -42,7 +45,7 @@ impl Window {
 
             match event {
                 Event::RedrawRequested(window_id) if window_id == window.id() => {
-                    render.draw(&appstate, &config, &mut pixels);
+                    app.draw(&appstate, &config, &mut pixels);
 
                     if pixels.render().is_err() {
                         *control_flow = ControlFlow::Exit;
