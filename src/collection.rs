@@ -25,42 +25,44 @@ impl AssetCollection {
         self.assets.get(self.cursor)
     }
 
-    pub fn advance(&mut self, inc: usize) {
-        let new = self.cursor + inc;
-        if new < self.assets.len() {
-            self.cursor = new;
+    pub fn increment(&mut self, inc: usize) -> bool {
+        let next = self.cursor + inc;
+        if next < self.assets.len() {
+            self.cursor = next;
         } else {
             self.cursor = self.assets.len() - 1;
         }
+        true
     }
 
-    pub fn decrement(&mut self, dec: usize) {
+    pub fn decrement(&mut self, dec: usize) -> bool {
         if self.cursor > dec {
             self.cursor = self.cursor - dec;
         } else {
             self.cursor = 0;
         }
+        true
     }
 
-    /// Get the next asset
-    pub fn prev(&mut self) -> Option<&PathBuf> {
-        if self.cursor == 0 {
-            self.cursor = self.assets.len() - 1;
-        } else {
-            self.cursor -= 1;
-        }
-
-        self.assets.get(self.cursor)
-    }
-
-    /// Get the next asset
-    pub fn next(&mut self) -> Option<&PathBuf> {
-        if self.cursor == self.assets.len() - 1 {
-            self.cursor = 0;
-        } else {
-            self.cursor += 1;
-        }
-
-        self.assets.get(self.cursor)
-    }
+    // /// Get the next asset
+    // pub fn prev(&mut self) -> Option<&PathBuf> {
+    //     if self.cursor == 0 {
+    //         self.cursor = self.assets.len() - 1;
+    //     } else {
+    //         self.cursor -= 1;
+    //     }
+    //
+    //     self.assets.get(self.cursor)
+    // }
+    //
+    // /// Get the next asset
+    // pub fn next(&mut self) -> Option<&PathBuf> {
+    //     if self.cursor == self.assets.len() - 1 {
+    //         self.cursor = 0;
+    //     } else {
+    //         self.cursor += 1;
+    //     }
+    //
+    //     self.assets.get(self.cursor)
+    // }
 }

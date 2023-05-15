@@ -1,4 +1,4 @@
-use crate::components::Component;
+use crate::{components::Component, msg::Msg, state::AppState};
 
 use super::IndexView;
 
@@ -17,8 +17,11 @@ impl Component for App {
         self.grid.resize(width, height);
     }
 
-    fn update(&mut self, _state: &mut crate::state::AppState) -> bool {
-        true
+    fn update(&mut self, msg: Msg, state: &mut AppState) -> bool {
+        match state.layout {
+            crate::state::LayoutState::SingleView => todo!(),
+            crate::state::LayoutState::IndexView => self.grid.update(msg, state),
+        }
     }
 
     fn draw(

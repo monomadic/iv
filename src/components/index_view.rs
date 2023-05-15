@@ -3,7 +3,7 @@ use std::{collections::HashMap, path::PathBuf};
 use image::{DynamicImage, GenericImageView};
 use pixels::Pixels;
 
-use crate::state::AppState;
+use crate::{msg::Msg, state::AppState};
 
 use super::Component;
 
@@ -11,7 +11,7 @@ use super::Component;
 pub struct IndexView {
     width: u32,
     height: u32,
-    thumbcache: HashMap<String, DynamicImage>,
+    cache: HashMap<String, DynamicImage>,
 }
 
 impl Component for IndexView {
@@ -20,8 +20,13 @@ impl Component for IndexView {
         self.height = height;
     }
 
-    fn update(&mut self, _state: &mut AppState) -> bool {
-        true
+    fn update(&mut self, msg: Msg, state: &mut AppState) -> bool {
+        match msg {
+            Msg::MoveUp => state.assets.decrement(state.cols as usize),
+            Msg::MoveDown => state.assets.increment(state.cols as usize),
+            Msg::MoveLeft => state.assets.decrement(1),
+            Msg::MoveRight => state.assets.increment(1),
+        }
     }
 
     fn draw(
@@ -39,12 +44,12 @@ impl Component for IndexView {
             .filter_map(|path| {
                 let hash = self.hash(&path, thumb_width);
 
-                if let Some(cached_thumb) = self.thumbcache.get(&hash) {
+                if let Some(cached_thumb) = self.cache.get(&hash) {
                     Some(cached_thumb.clone())
                 } else {
                     let processed_thumb =
                         process_image(path, thumb_width, config.thumbnail_padding)?;
-                    self.thumbcache.insert(hash, processed_thumb.clone());
+                    self.cache.insert(hash, processed_thumb.clone());
                     Some(processed_thumb)
                 }
             })
@@ -55,7 +60,7 @@ impl Component for IndexView {
             &thumbs,
             pixels,
             state.cols,
-            state.rowskip,
+            self.rowskip(state.cursor(), state.cols, state.assets.assets.len()),
             config.thumbnail_padding,
             config.thumbnail_border_thickness,
             state.cursor(),
@@ -66,6 +71,19 @@ impl Component for IndexView {
 impl IndexView {
     fn hash(&self, path: &PathBuf, width: u32) -> String {
         format!("{:?}#{}", path, width)
+    }
+
+    fn rowskip(&self, cursor: usize, cols: u32, total_assets: usize) -> u32 {
+        // let total_rows = (total_assets as f64 / cols as f64).ceil() as u32;
+        let col_width = (self.width as f32 / cols as f32).floor() as u32;
+        let current_row = (cursor as f32 / cols as f32) as u32 + 1;
+        let rows_on_screen = self.height / col_width;
+
+        if current_row > rows_on_screen {
+            current_row - rows_on_screen
+        } else {
+            0
+        }
     }
 
     pub fn render_index_view(

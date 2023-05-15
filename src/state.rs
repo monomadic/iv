@@ -3,10 +3,11 @@ use std::path::Path;
 
 #[derive(Default)]
 pub struct AppState {
+    // entire list of assets as paths
     pub assets: AssetCollection,
     pub layout: LayoutState,
+    // number of columns in index view
     pub cols: u32,
-    pub rowskip: u32, // not needed
 }
 
 #[derive(Default)]
@@ -33,7 +34,6 @@ impl AppState {
             assets,
             layout,
             cols: 6,
-            rowskip: 0,
         })
     }
 
@@ -49,46 +49,45 @@ impl AppState {
         self.assets.cursor
     }
 
-    pub fn down(&mut self) {
-        self.assets.advance(self.cols as usize);
-        // shift entire canvas down
-        let rows = (self.cols as f32 / 3.0).floor() as u32; // assume 2:3 aspect
-        if (rows + self.rowskip) < self.current_row()
-            && (rows + self.rowskip) != self.current_row() - 1
-        {
-            self.rowskip = self.current_row() - 2;
-        }
-    }
-
-    pub fn up(&mut self) {
-        self.assets.decrement(self.cols as usize);
-        // shift entire canvas down
-        if self.rowskip > 0 {
-            self.rowskip -= 1;
-        }
-    }
-
-    pub fn left(&mut self) {
-        if self.assets.cursor != 0 {
-            self.assets.prev();
-        }
-    }
-
-    pub fn right(&mut self) {
-        self.assets.next();
-
-        if self.current_row() == 0 {
-            self.rowskip = 0;
-        }
-    }
+    // pub fn down(&mut self) {
+    //     self.assets.advance(self.cols as usize);
+    //     // shift entire canvas down
+    //     let rows = (self.cols as f32 / 3.0).floor() as u32; // assume 2:3 aspect
+    //     if (rows + self.rowskip) < self.current_row()
+    //         && (rows + self.rowskip) != self.current_row() - 1
+    //     {
+    //         self.rowskip = self.current_row() - 2;
+    //     }
+    // }
+    //
+    // pub fn up(&mut self) {
+    //     self.assets.decrement(self.cols as usize);
+    //     // shift entire canvas down
+    //     if self.rowskip > 0 {
+    //         self.rowskip -= 1;
+    //     }
+    // }
+    // pub fn left(&mut self) {
+    //     if self.assets.cursor != 0 {
+    //         self.assets.prev();
+    //     }
+    // }
+    //
+    // pub fn right(&mut self) {
+    //     self.assets.next();
+    //
+    //     if self.current_row() == 0 {
+    //         self.rowskip = 0;
+    //     }
+    // }
 
     // PRIVATE
 
-    fn current_row(&self) -> u32 {
-        (self.assets.cursor as f64 / self.total_rows() as f64) as u32
-    }
-
-    fn total_rows(&self) -> usize {
-        (self.assets.assets.len() as f64 / self.cols as f64).ceil() as usize
-    }
+    // fn current_row(&self) -> u32 {
+    //     (self.assets.cursor as f64 / self.total_rows() as f64) as u32
+    // }
+    //
+    // fn total_rows(&self) -> usize {
+    //     (self.assets.assets.len() as f64 / self.cols as f64).ceil() as usize
+    // }
 }

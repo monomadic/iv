@@ -8,17 +8,17 @@ use winit::{
 #[cfg(target_os = "macos")]
 use winit::platform::macos::WindowExtMacOS;
 
-use crate::state::AppState;
 use crate::{
     components::{App, Component},
     config::Config,
     prelude::*,
 };
+use crate::{msg::Msg, state::AppState};
 
 pub struct Window;
 
 impl Window {
-    pub fn new(mut appstate: AppState, mut app: App, config: Config) -> Result<()> {
+    pub fn new(mut state: AppState, mut app: App, config: Config) -> Result<()> {
         let event_loop = EventLoop::new();
         let window = WindowBuilder::new()
             .with_title("iV")
@@ -45,7 +45,7 @@ impl Window {
 
             match event {
                 Event::RedrawRequested(window_id) if window_id == window.id() => {
-                    app.draw(&appstate, &config, &mut pixels);
+                    app.draw(&state, &config, &mut pixels);
 
                     if pixels.render().is_err() {
                         *control_flow = ControlFlow::Exit;
@@ -66,69 +66,77 @@ impl Window {
                     } => match virtual_code {
                         Escape | Q => control_flow.set_exit(),
                         VirtualKeyCode::Key1 => {
-                            appstate.cols = 3;
+                            state.cols = 3;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key2 => {
-                            appstate.cols = 4;
+                            state.cols = 4;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key3 => {
-                            appstate.cols = 5;
+                            state.cols = 5;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key4 => {
-                            appstate.cols = 6;
+                            state.cols = 6;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key5 => {
-                            appstate.cols = 7;
+                            state.cols = 7;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key6 => {
-                            appstate.cols = 8;
+                            state.cols = 8;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key7 => {
-                            appstate.cols = 9;
+                            state.cols = 9;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Minus => {
-                            appstate.cols += 1;
+                            state.cols += 1;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Equals => {
-                            if appstate.cols > 2 {
-                                appstate.cols -= 1;
+                            if state.cols > 2 {
+                                state.cols -= 1;
                             }
                             window.request_redraw();
                         }
                         VirtualKeyCode::Key8 => {
-                            appstate.cols = 10;
+                            state.cols = 10;
                             window.request_redraw();
                         }
                         VirtualKeyCode::Space | VirtualKeyCode::Return => {
-                            appstate.toggle_layout();
+                            state.toggle_layout();
                             window.request_redraw();
                         }
                         VirtualKeyCode::F => {
                             window.set_simple_fullscreen(!window.simple_fullscreen());
                         }
                         VirtualKeyCode::H | VirtualKeyCode::Left => {
-                            appstate.left();
-                            window.request_redraw();
-                        }
-                        VirtualKeyCode::J | VirtualKeyCode::Down => {
-                            appstate.down();
-                            window.request_redraw();
-                        }
-                        VirtualKeyCode::K | VirtualKeyCode::Up => {
-                            appstate.up();
-                            window.request_redraw();
+                            if app.update(Msg::MoveLeft, &mut state) {
+                                window.request_redraw();
+                            }
                         }
                         VirtualKeyCode::L | VirtualKeyCode::Right => {
-                            appstate.right();
-                            window.request_redraw();
+                            if app.update(Msg::MoveRight, &mut state) {
+                                window.request_redraw();
+                            }
+                        }
+                        VirtualKeyCode::J | VirtualKeyCode::Down => {
+                            if app.update(Msg::MoveDown, &mut state) {
+                                window.request_redraw();
+                            }
+                            // state.down();
+                            // window.request_redraw();
+                        }
+                        VirtualKeyCode::K | VirtualKeyCode::Up => {
+                            if app.update(Msg::MoveUp, &mut state) {
+                                window.request_redraw();
+                            }
+                            // state.up();
+                            // window.request_redraw();
                         }
                         _ => (),
                     },

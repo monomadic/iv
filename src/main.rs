@@ -4,6 +4,7 @@ mod config;
 mod error;
 mod image;
 mod loader;
+mod msg;
 mod prelude;
 mod state;
 mod window;
