@@ -60,7 +60,7 @@ impl Component for IndexView {
             &thumbs,
             pixels,
             state.cols,
-            self.rowskip(state.cursor(), state.cols, state.assets.assets.len()),
+            self.rowskip(state.cursor(), state.cols),
             config.thumbnail_padding,
             config.thumbnail_border_thickness,
             state.cursor(),
@@ -73,7 +73,7 @@ impl IndexView {
         format!("{:?}#{}", path, width)
     }
 
-    fn rowskip(&self, cursor: usize, cols: u32, total_assets: usize) -> u32 {
+    fn rowskip(&self, cursor: usize, cols: u32) -> u32 {
         // let total_rows = (total_assets as f64 / cols as f64).ceil() as u32;
         let col_width = (self.width as f32 / cols as f32).floor() as u32;
         let current_row = (cursor as f32 / cols as f32) as u32 + 1;
