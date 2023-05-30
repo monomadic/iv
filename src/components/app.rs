@@ -6,7 +6,7 @@ use super::IndexView;
 pub struct App {
     width: u32,
     height: u32,
-    grid: IndexView,
+    index_view: IndexView,
 }
 
 impl Component for App {
@@ -14,13 +14,13 @@ impl Component for App {
         self.width = width;
         self.height = height;
         // grid component is full size of window
-        self.grid.resize(width, height);
+        self.index_view.resize(width, height);
     }
 
     fn update(&mut self, msg: Msg, state: &mut AppState) -> bool {
         match state.layout {
-            crate::state::LayoutState::SingleView => todo!(),
-            crate::state::LayoutState::IndexView => self.grid.update(msg, state),
+            crate::state::LayoutState::SingleView => true,
+            crate::state::LayoutState::IndexView => self.index_view.update(msg, state),
         }
     }
 
@@ -37,7 +37,7 @@ impl Component for App {
                 crate::image::copy_image(&image, pixels, self.width, self.height);
             }
             crate::state::LayoutState::IndexView => {
-                self.grid.draw(state, config, pixels);
+                self.index_view.draw(state, config, pixels);
             }
         }
     }

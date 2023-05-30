@@ -1,3 +1,4 @@
+mod cache;
 mod collection;
 mod components;
 mod config;

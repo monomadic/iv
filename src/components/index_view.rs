@@ -12,6 +12,7 @@ pub struct IndexView {
     width: u32,
     height: u32,
     cache: HashMap<String, DynamicImage>,
+    //thumbs: ImageCache,
 }
 
 impl Component for IndexView {
@@ -37,6 +38,7 @@ impl Component for IndexView {
     ) {
         let thumb_width = self.width / state.cols;
 
+        // TODO: move to update
         let thumbs: Vec<DynamicImage> = state
             .assets
             .assets

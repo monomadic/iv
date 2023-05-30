@@ -1,19 +1,20 @@
 use pixels::{Pixels, SurfaceTexture};
+
+#[cfg(target_os = "macos")]
+use winit::platform::macos::WindowExtMacOS;
 use winit::{
     event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,
 };
 
-#[cfg(target_os = "macos")]
-use winit::platform::macos::WindowExtMacOS;
-
 use crate::{
     components::{App, Component},
     config::Config,
+    msg::Msg,
     prelude::*,
+    state::AppState,
 };
-use crate::{msg::Msg, state::AppState};
 
 pub struct Window;
 
@@ -34,8 +35,9 @@ impl Window {
 
         let mut pixels = {
             let surface_texture = SurfaceTexture::new(width, height, &window);
-            Pixels::new(width, height, surface_texture).expect("pixels err")
-        };
+            Pixels::new(width, height, surface_texture)
+        }
+        .expect("pixels err"); // TODO: coalesce
         pixels.clear_color(pixels::wgpu::Color::BLACK);
 
         event_loop.run(move |event, _elwt, control_flow| {
@@ -128,15 +130,11 @@ impl Window {
                             if app.update(Msg::MoveDown, &mut state) {
                                 window.request_redraw();
                             }
-                            // state.down();
-                            // window.request_redraw();
                         }
                         VirtualKeyCode::K | VirtualKeyCode::Up => {
                             if app.update(Msg::MoveUp, &mut state) {
                                 window.request_redraw();
                             }
-                            // state.up();
-                            // window.request_redraw();
                         }
                         _ => (),
                     },
