@@ -1,4 +1,10 @@
+<p align="center">
+  <img src="banner.jpg" />
+</p>
+
 # IV
+
+IV (pronounced ivy) is a fast minimal image gallery viewer. There seem to be many image viewer apps (even in rust) and they all seemed terrible to me and my workflow, and this is the result of that frustration.
 
 Developed on MacOS but should run fine on other platforms. IV was designed for terminal users, but is a gui app.
 

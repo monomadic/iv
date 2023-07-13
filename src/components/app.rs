@@ -32,9 +32,9 @@ impl Component for App {
     ) {
         match state.layout {
             crate::state::LayoutState::SingleView => {
-                let path = state.assets.current().expect("no current");
-                let image = image::open(path).expect("image open");
-                crate::image::copy_image(&image, pixels, self.width, self.height);
+                // let path = state.assets.current().expect("no current");
+                // let image = image::open(path).expect("image open");
+                // crate::image::copy_image(&image, pixels, self.width, self.height);
             }
             crate::state::LayoutState::IndexView => {
                 self.index_view.draw(state, config, pixels);

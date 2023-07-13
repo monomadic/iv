@@ -47,7 +47,7 @@ impl Window {
 
             match event {
                 Event::RedrawRequested(window_id) if window_id == window.id() => {
-                    app.draw(&state, &config, &mut pixels);
+                    app.draw(&mut state, &config, &mut pixels);
 
                     if pixels.render().is_err() {
                         *control_flow = ControlFlow::Exit;

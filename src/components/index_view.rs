@@ -37,32 +37,33 @@ impl Component for IndexView {
         pixels: &mut pixels::Pixels,
     ) {
         let thumb_width = self.width / state.cols;
+        let thumbs = state.assets.thumbs();
 
-        // TODO: move to update
-        let thumbs: Vec<DynamicImage> = state
-            .assets
-            .assets
-            .iter()
-            .filter_map(|path| {
-                let hash = self.hash(&path, thumb_width);
-
-                if let Some(cached_thumb) = self.cache.get(&hash) {
-                    Some(cached_thumb.clone())
-                } else {
-                    let processed_thumb =
-                        process_image(path, thumb_width, config.thumbnail_padding)?;
-                    self.cache.insert(hash, processed_thumb.clone());
-                    Some(processed_thumb)
-                }
-            })
-            .collect();
+        // // TODO: move to update
+        // let thumbs: Vec<DynamicImage> = state
+        //     .assets
+        //     .
+        //     .iter()
+        //     .filter_map(|path| {
+        //         let hash = self.hash(&path, thumb_width);
+        //
+        //         if let Some(cached_thumb) = self.cache.get(&hash) {
+        //             Some(cached_thumb.clone())
+        //         } else {
+        //             let processed_thumb =
+        //                 process_image(path, thumb_width, config.thumbnail_padding)?;
+        //             self.cache.insert(hash, processed_thumb.clone());
+        //             Some(processed_thumb)
+        //         }
+        //     })
+        //     .collect();
 
         // render
         self.render_index_view(
-            &thumbs,
+            thumbs,
             pixels,
             state.cols,
-            self.rowskip(state.cursor(), state.cols),
+            self.rowskip(state.assets.cursor, state.cols),
             config.thumbnail_padding,
             config.thumbnail_border_thickness,
             state.cursor(),
@@ -90,7 +91,7 @@ impl IndexView {
 
     pub fn render_index_view(
         &self,
-        thumbs: &Vec<DynamicImage>,
+        thumbs: Vec<&DynamicImage>,
         pixels: &mut Pixels,
         cols: u32,
         rowskip: u32,

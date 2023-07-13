@@ -1,28 +1,47 @@
 use crate::{filesystem::get_images_from_directory, prelude::*};
-use std::path::{Path, PathBuf};
+use image::{io::Reader as ImageReader, DynamicImage};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+};
 
 #[derive(Default, Clone)]
 pub struct AssetCollection {
-    pub assets: Vec<PathBuf>,
+    pub assets: HashMap<PathBuf, DynamicImage>,
+    pub collection: Vec<PathBuf>,
     pub cursor: usize,
 }
 
 impl AssetCollection {
     pub fn new<P: AsRef<Path>>(path: P) -> Result<Self> {
-        let images = get_images_from_directory(&path.as_ref())?;
-        let index = images
-            .iter()
-            .position(|p| p.as_path() == path.as_ref())
-            .unwrap_or(0);
+        let path = path.as_ref();
+        let images = get_images_from_directory(&path)?;
+
+        // find the current index
+        // unnecessary; just write during the iter
+        let index = images.iter().position(|p| p.as_path() == path).unwrap_or(0);
+
+        let mut assets = HashMap::new();
+        for image in images {
+            if let Ok(image) = ImageReader::open(&path)?.decode() {
+                assets.insert(path.to_path_buf(), image);
+            }
+        }
+
+        let current_selection = assets.keys().map(|path| path.clone()).collect();
 
         Ok(AssetCollection {
-            assets: images,
+            assets,
+            collection: current_selection,
             cursor: index,
         })
     }
 
-    pub fn current(&self) -> Option<&PathBuf> {
-        self.assets.get(self.cursor)
+    pub fn current(&self) -> Option<&DynamicImage> {
+        self.collection
+            .get(self.cursor)
+            .map(|path| self.assets.get(path))
+            .flatten()
     }
 
     pub fn increment(&mut self, inc: usize) -> bool {
@@ -42,6 +61,25 @@ impl AssetCollection {
             self.cursor = 0;
         }
         true
+    }
+
+    pub fn thumbs(&self) -> Vec<&DynamicImage> {
+        self.collection
+            .iter()
+            .map(|path| {
+                self.assets.get(path)
+                // let hash = self.hash(&path, thumb_width);
+                // if let Some(cached_thumb) = self.cache.get(&hash) {
+                //     Some(cached_thumb.clone())
+                // } else {
+                //     let processed_thumb =
+                //         process_image(path, thumb_width, config.thumbnail_padding)?;
+                //     self.cache.insert(hash, processed_thumb.clone());
+                //     Some(processed_thumb)
+                // }
+            })
+            .flatten()
+            .collect()
     }
 
     // /// Get the next asset
