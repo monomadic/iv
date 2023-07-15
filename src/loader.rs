@@ -6,8 +6,8 @@ use image::io::Reader as ImageReader;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-pub fn get_images_from_directory(path: &Path) -> Result<Vec<PathBuf>> {
-    get_target_directory(path).and_then(get_image_paths)
+pub fn get_images_from_directory<P: AsRef<Path>>(path: P) -> Result<Vec<PathBuf>> {
+    get_target_directory(path.as_ref()).and_then(get_image_paths)
 }
 
 pub fn get_images_from_glob(arg: &str) -> Result<Vec<PathBuf>> {
@@ -42,4 +42,19 @@ fn get_image_paths<P: AsRef<Path>>(dir: P) -> Result<Vec<PathBuf>> {
         .map(|entry| entry.path())
         .filter(|path| is_image(&path))
         .collect::<Vec<PathBuf>>())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_images_from_directory() -> Result<()> {
+        assert_eq!(
+            get_images_from_directory(".").unwrap(),
+            Vec::<PathBuf>::new()
+        );
+
+        Ok(())
+    }
 }
