@@ -1,7 +1,4 @@
-// asset loading strategy
-
 use crate::prelude::*;
-
 use image::io::Reader as ImageReader;
 use std::fs;
 use std::path::{Path, PathBuf};

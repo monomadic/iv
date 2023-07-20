@@ -1,4 +1,4 @@
-use crate::{loader::get_images_from_directory, prelude::*};
+use crate::{filesystem::get_images_from_directory, prelude::*};
 use std::path::{Path, PathBuf};
 
 #[derive(Default, Clone)]
