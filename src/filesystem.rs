@@ -26,7 +26,6 @@ fn get_target_directory(path: &Path) -> Result<PathBuf> {
     }
 }
 
-// TODO: unnecessary function, validate later
 fn is_image(path: &Path) -> bool {
     ImageReader::open(path)
         .ok()
@@ -62,7 +61,23 @@ mod tests {
         let images = result.unwrap();
         // Test that the images Vec is not empty, and each path points to a valid image
         assert!(!images.is_empty());
-        assert_eq!(images.len(), 4);
+        assert_eq!(
+            images
+                .iter()
+                .flat_map(|p| p.to_str())
+                .collect::<Vec<&str>>(),
+            vec![
+                "assets/cyberpunk.jpg",
+                "assets/hato.profile0.8bpc.yuv420.avif",
+                "assets/bad_image.jpg",
+                "assets/partial.jpg",
+                "assets/girl.jpg",
+                "assets/rooms.webp",
+                "assets/img1.png",
+                "assets/iso.jpg"
+            ]
+        );
+
         for image in images {
             assert!(is_image(&image));
         }

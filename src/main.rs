@@ -1,5 +1,4 @@
 mod cache;
-mod collection;
 mod components;
 mod config;
 mod error;
@@ -19,7 +18,7 @@ fn main() -> Result<()> {
     // init state
     let state = state::AppState::new(path)?;
     // layout
-    let app = components::App::default();
+    let layout = components::AppComponent::default();
     // show window
-    window::Window::new(state, app, config)
+    window::Window::new(state, layout, config)
 }

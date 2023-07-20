@@ -6,9 +6,20 @@ use image::DynamicImage;
 /// It uses a HashMap to store DynamicImage objects, which are keyed by a hash string.
 /// The hash string is a combination of a provided key and the desired image dimensions.#[derive(Default)]
 #[derive(Default)]
-pub(crate) struct ImageCache(HashMap<String, DynamicImage>);
+pub struct ImageCache(HashMap<String, DynamicImage>);
 
 impl ImageCache {
+    pub fn get(&self, key: &str, width: u32, height: u32) -> Option<&DynamicImage> {
+        let hash: String = self.hash(key, width, height);
+        let res = self.0.get(&hash);
+        if res.is_some() {
+            println!("CACHE GET [HIT]: {} ", hash);
+        } else {
+            println!("CACHE GET [MISS]: {} ", hash);
+        }
+        res
+    }
+
     /// Stores an image in the cache and returns a reference to the cached image.
     ///
     /// # Arguments
@@ -27,14 +38,16 @@ impl ImageCache {
     /// # Returns
     ///
     /// A reference to the DynamicImage that is now stored in the cache.
-    pub fn store(
+    pub fn upsert<S: ToString>(
         &mut self,
-        key: &str,
-        image: DynamicImage,
+        key: S,
+        image: &DynamicImage,
         width: u32,
         height: u32,
     ) -> &DynamicImage {
-        let key: String = self.hash(key, width, height);
+        let key: String = self.hash(&key.to_string(), width, height);
+
+        println!("storing {}", key);
 
         if !self.0.contains_key(&key) {
             let image = image.resize(width, height, image::imageops::FilterType::Nearest);
@@ -42,6 +55,13 @@ impl ImageCache {
         }
 
         self.0.get(&key).unwrap()
+    }
+
+    pub fn store<S: ToString>(&mut self, key: S, image: &DynamicImage, width: u32, height: u32) {
+        let key: String = self.hash(&key.to_string(), width, height);
+        println!("CACHE PUT {}", key);
+        let image = image.resize(width, height, image::imageops::FilterType::Nearest);
+        self.0.insert(key.to_string(), image);
     }
 
     /// Creates the hash used as the key for each cache entry.
@@ -63,7 +83,6 @@ impl ImageCache {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use image::{DynamicImage, GenericImage, GenericImageView, Rgba};
 
     #[cfg(test)]
     mod tests {
@@ -80,7 +99,7 @@ mod tests {
             img.put_pixel(2, 2, Rgba([50, 50, 50, 50]));
 
             // Store image with dimensions 10x10
-            let img_ref = cache.store("test", img.clone(), 10, 10);
+            let img_ref = cache.upsert("test", &img.clone(), 10, 10);
 
             // Check if the image was resized correctly
             let dimensions = img_ref.dimensions();
@@ -90,7 +109,7 @@ mod tests {
             std::mem::drop(img_ref);
 
             // Check if the same reference is returned for an existing key
-            let img_ref_second = cache.store("test", img, 10, 10);
+            let img_ref_second = cache.upsert("test", &img, 10, 10);
             assert_eq!(img_ref_second.dimensions(), dimensions);
         }
     }

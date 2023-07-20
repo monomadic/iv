@@ -2,18 +2,17 @@ use pixels::Pixels;
 
 use crate::{config::Config, msg::Msg, state::AppState};
 
-mod app;
+mod app_component;
+mod gallery_component;
+mod image_component;
 mod index_view;
+mod solo_view;
 
-pub use app::App;
+pub use app_component::AppComponent;
 pub use index_view::IndexView;
 
-// pub type AppComponent = dyn Component<AppState>;
-
 pub trait Component {
-    fn resize(&mut self, width: u32, height: u32);
-    // TODO: make Msg and Appstate generic <M, S>
-    fn update(&mut self, msg: Msg, state: &mut AppState) -> bool;
-    // TODO: remove config (use state), make pixels -> renderer, make generic <R>
+    fn update(&mut self, msg: Msg, state: &mut AppState, config: &Config) -> bool;
     fn draw(&mut self, state: &AppState, config: &Config, pixels: &mut Pixels);
+    // fn children(&self) -> Vec<&Self>;
 }
