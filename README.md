@@ -1,8 +1,10 @@
 <p align="center">
-  <img src="banner.jpg" />
+  <img src="assets/banner.jpg" />
 </p>
 
 # IV
+
+_Warning: still in development, please don't use this yet._
 
 IV (pronounced ivy) is a fast minimal image gallery viewer. There seem to be many image viewer apps (even in rust) and they all seemed terrible to me and my workflow, and this is the result of that frustration.
 
