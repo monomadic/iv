@@ -16,20 +16,24 @@ pub struct AppComponent {
 }
 
 impl Component for AppComponent {
-    fn update(&mut self, msg: Msg, state: &mut AppState, config: &Config) -> bool {
+    fn update(&mut self, msg: &Msg, state: &mut AppState, config: &Config) -> bool {
         match msg {
             Msg::Resized(width, height) => {
-                self.width = width;
-                self.height = height;
+                self.width = *width;
+                self.height = *height;
             }
             _ => (),
         }
 
+        self.solo_view.update(msg, state, config);
+        self.index_view.update(msg, state, config);
+        true
+
         // update children
-        match state.layout_state {
-            LayoutState::SingleView => self.solo_view.update(msg, state, config),
-            LayoutState::IndexView => self.index_view.update(msg, state, config),
-        }
+        // match state.layout_state {
+        //     LayoutState::SingleView => self.solo_view.update(msg, state, config),
+        //     LayoutState::IndexView => self.index_view.update(msg, state, config),
+        // }
     }
 
     fn draw(
@@ -41,8 +45,8 @@ impl Component for AppComponent {
         // TODO: render children automatically
         match state.layout_state {
             LayoutState::SingleView => {
-                crate::image::copy_image(state.current_image(), pixels, self.width, self.height);
-                //self.solo_view.draw(state, config, pixels);
+                //crate::image::copy_image(state.current_image(), pixels, self.width, self.height);
+                self.solo_view.draw(state, config, pixels);
             }
             LayoutState::IndexView => {
                 self.index_view.draw(state, config, pixels);

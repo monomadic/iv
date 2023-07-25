@@ -13,7 +13,7 @@ pub struct IndexView {
 }
 
 impl Component for IndexView {
-    fn update(&mut self, msg: Msg, state: &mut AppState, config: &Config) -> bool {
+    fn update(&mut self, msg: &Msg, state: &mut AppState, config: &Config) -> bool {
         // move the selected thumbnail
         match msg {
             Msg::MoveUp => state.collection.decrement(state.cols as usize),
@@ -21,8 +21,8 @@ impl Component for IndexView {
             Msg::MoveLeft => state.collection.decrement(1),
             Msg::MoveRight => state.collection.increment(1),
             Msg::Resized(width, height) => {
-                self.width = width;
-                self.height = height;
+                self.width = *width;
+                self.height = *height;
                 // precache
                 for key in
                     self.visible_images(&state, state.cols as f32, config.thumbnail_padding as f32)

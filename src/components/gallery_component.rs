@@ -1,7 +1,5 @@
 use std::path::PathBuf;
 
-use image::GenericImageView;
-
 use crate::{msg::Msg, state::AppState};
 
 use super::Component;
@@ -23,7 +21,7 @@ impl GalleryComponent {
 }
 
 impl Component for GalleryComponent {
-    fn update(&mut self, msg: Msg, state: &mut AppState, config: &crate::config::Config) -> bool {
+    fn update(&mut self, msg: &Msg, state: &mut AppState, config: &crate::config::Config) -> bool {
         // move the selected thumbnail
         match msg {
             Msg::MoveUp => state.collection.decrement(state.cols as usize),
@@ -31,8 +29,8 @@ impl Component for GalleryComponent {
             Msg::MoveLeft => state.collection.decrement(1),
             Msg::MoveRight => state.collection.increment(1),
             Msg::Resized(width, height) => {
-                self.width = width;
-                self.height = height;
+                self.width = *width;
+                self.height = *height;
                 // heat up the thumb cache
             }
         }

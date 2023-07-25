@@ -1,4 +1,4 @@
-use crate::msg::Msg;
+use crate::{config::Config, msg::Msg, state::AppState};
 
 use super::Component;
 
@@ -10,16 +10,11 @@ pub struct ImageComponent {
 }
 
 impl Component for ImageComponent {
-    fn update(
-        &mut self,
-        msg: crate::msg::Msg,
-        state: &mut crate::state::AppState,
-        _config: &crate::config::Config,
-    ) -> bool {
+    fn update(&mut self, msg: &Msg, state: &mut AppState, _config: &Config) -> bool {
         match msg {
             Msg::Resized(width, height) => {
-                self.width = width;
-                self.height = height;
+                self.width = *width;
+                self.height = *height;
                 true
             }
             Msg::MoveLeft | Msg::MoveUp => {
@@ -37,9 +32,9 @@ impl Component for ImageComponent {
     fn draw(
         &mut self,
         state: &crate::state::AppState,
-        config: &crate::config::Config,
+        _config: &crate::config::Config,
         pixels: &mut pixels::Pixels,
     ) {
-        todo!()
+        crate::image::copy_image(state.current_image(), pixels, self.width, self.height);
     }
 }

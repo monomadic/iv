@@ -31,7 +31,7 @@ impl Window {
         window.set_simple_fullscreen(true);
 
         let (width, height): (u32, u32) = window.inner_size().into();
-        app.update(Msg::Resized(width, height), &mut state, &config);
+        app.update(&Msg::Resized(width, height), &mut state, &config);
 
         let mut pixels = {
             let surface_texture = SurfaceTexture::new(width, height, &window);
@@ -117,22 +117,22 @@ impl Window {
                             window.set_simple_fullscreen(!window.simple_fullscreen());
                         }
                         VirtualKeyCode::H | VirtualKeyCode::Left => {
-                            if app.update(Msg::MoveLeft, &mut state, &config) {
+                            if app.update(&Msg::MoveLeft, &mut state, &config) {
                                 window.request_redraw();
                             }
                         }
                         VirtualKeyCode::L | VirtualKeyCode::Right => {
-                            if app.update(Msg::MoveRight, &mut state, &config) {
+                            if app.update(&Msg::MoveRight, &mut state, &config) {
                                 window.request_redraw();
                             }
                         }
                         VirtualKeyCode::J | VirtualKeyCode::Down => {
-                            if app.update(Msg::MoveDown, &mut state, &config) {
+                            if app.update(&Msg::MoveDown, &mut state, &config) {
                                 window.request_redraw();
                             }
                         }
                         VirtualKeyCode::K | VirtualKeyCode::Up => {
-                            if app.update(Msg::MoveUp, &mut state, &config) {
+                            if app.update(&Msg::MoveUp, &mut state, &config) {
                                 window.request_redraw();
                             }
                         }
