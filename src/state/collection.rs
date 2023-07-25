@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 #[derive(Default, Clone, Debug)]
 pub struct AssetCollection {
     pub keys: Vec<String>,

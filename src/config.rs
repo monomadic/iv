@@ -3,6 +3,7 @@ pub struct Config {
     pub thumbnail_border_thickness: u32,
     // thumbnail_border_color: u32,
     // thumbnail_aspect: ThumbnailAspect, // whether to display thumbnails using the full space of the thumbnail
+    pub index_columns: u32,
 }
 
 impl Default for Config {
@@ -10,6 +11,7 @@ impl Default for Config {
         Self {
             thumbnail_padding: 6,
             thumbnail_border_thickness: 10,
+            index_columns: 6,
         }
     }
 }

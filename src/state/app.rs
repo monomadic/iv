@@ -22,7 +22,7 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub fn new<P: AsRef<Path>>(path: P) -> Result<Self> {
+    pub fn new<P: AsRef<Path>>(path: P, default_columns: u32) -> Result<Self> {
         let path = path.as_ref();
         // load and validate images into memory
         let image_paths = get_images_from_directory(&path)?;
@@ -53,8 +53,8 @@ impl AppState {
             files,
             collection,
             layout_state,
-            cache: ImageCache::default(), // TODO: new()
-            cols: 6,
+            cache: ImageCache::default(),
+            cols: default_columns,
             placeholder,
         })
     }

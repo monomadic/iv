@@ -38,7 +38,7 @@ impl ImageCache {
     /// # Returns
     ///
     /// A reference to the DynamicImage that is now stored in the cache.
-    pub fn upsert<S: ToString>(
+    pub fn store_get<S: ToString>(
         &mut self,
         key: S,
         image: &DynamicImage,
@@ -46,14 +46,11 @@ impl ImageCache {
         height: u32,
     ) -> &DynamicImage {
         let key: String = self.hash(&key.to_string(), width, height);
-
-        println!("storing {}", key);
-
+        println!("CACHE PUT {}", key);
         if !self.0.contains_key(&key) {
             let image = image.resize(width, height, image::imageops::FilterType::Nearest);
             self.0.insert(key.clone(), image);
         }
-
         self.0.get(&key).unwrap()
     }
 
@@ -99,7 +96,7 @@ mod tests {
             img.put_pixel(2, 2, Rgba([50, 50, 50, 50]));
 
             // Store image with dimensions 10x10
-            let img_ref = cache.upsert("test", &img.clone(), 10, 10);
+            let img_ref = cache.store_get("test", &img.clone(), 10, 10);
 
             // Check if the image was resized correctly
             let dimensions = img_ref.dimensions();
@@ -109,7 +106,7 @@ mod tests {
             std::mem::drop(img_ref);
 
             // Check if the same reference is returned for an existing key
-            let img_ref_second = cache.upsert("test", &img, 10, 10);
+            let img_ref_second = cache.store_get("test", &img, 10, 10);
             assert_eq!(img_ref_second.dimensions(), dimensions);
         }
     }

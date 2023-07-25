@@ -13,13 +13,21 @@ impl Component for ImageComponent {
     fn update(
         &mut self,
         msg: crate::msg::Msg,
-        _state: &mut crate::state::AppState,
+        state: &mut crate::state::AppState,
         _config: &crate::config::Config,
     ) -> bool {
         match msg {
             Msg::Resized(width, height) => {
                 self.width = width;
                 self.height = height;
+                true
+            }
+            Msg::MoveLeft | Msg::MoveUp => {
+                state.collection.decrement(1);
+                true
+            }
+            Msg::MoveRight | Msg::MoveDown => {
+                state.collection.increment(1);
                 true
             }
             _ => false,

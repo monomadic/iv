@@ -9,16 +9,19 @@ mod prelude;
 mod state;
 mod window;
 
-use crate::prelude::*;
-
-fn main() -> Result<()> {
+fn main() -> Result<(), error::IVError> {
+    // Get default configuration
     let config = config::Config::default();
-    // parse args
+
+    // Parse cli arguments
     let path = std::env::args().nth(1).unwrap_or(".".into());
-    // init state
-    let state = state::AppState::new(path)?;
-    // layout
+
+    // Initialize application state
+    let state = state::AppState::new(path, config.index_columns)?;
+
+    // Create the initial UI
     let layout = components::AppComponent::default();
-    // show window
+
+    // Show application window
     window::Window::new(state, layout, config)
 }

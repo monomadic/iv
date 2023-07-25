@@ -27,17 +27,7 @@ impl Component for AppComponent {
 
         // update children
         match state.layout_state {
-            LayoutState::SingleView => match msg {
-                Msg::MoveLeft | Msg::MoveUp => {
-                    state.collection.decrement(1);
-                    true
-                }
-                Msg::MoveRight | Msg::MoveDown => {
-                    state.collection.increment(1);
-                    true
-                }
-                _ => false,
-            },
+            LayoutState::SingleView => self.solo_view.update(msg, state, config),
             LayoutState::IndexView => self.index_view.update(msg, state, config),
         }
     }
@@ -48,11 +38,11 @@ impl Component for AppComponent {
         config: &crate::config::Config,
         pixels: &mut pixels::Pixels,
     ) {
-        // TODO: render children automatically, check bool
+        // TODO: render children automatically
         match state.layout_state {
             LayoutState::SingleView => {
                 crate::image::copy_image(state.current_image(), pixels, self.width, self.height);
-                self.solo_view.draw(state, config, pixels);
+                //self.solo_view.draw(state, config, pixels);
             }
             LayoutState::IndexView => {
                 self.index_view.draw(state, config, pixels);
