@@ -1,4 +1,3 @@
-use image::GenericImage;
 use pixels::Pixels;
 
 use crate::{config::Config, msg::Msg, state::AppState};
@@ -77,7 +76,7 @@ impl Component for IndexView {
 
             let thumb = state
                 .cache
-                .get(path, width as u32, height as u32)
+                .get(path, width as u32)
                 .expect("image to be cached");
 
             // let thumb = crate::image::inset_border(thumb.clone(), 10.0);
@@ -107,7 +106,14 @@ impl Component for IndexView {
             // Draw border for the selected thumbnail
             if i == selected as f32 + (rowskip * cols) {
                 crate::image::border(
-                    buffer, frame_w, frame_h, offset_x, offset_y, width, height, 10.0,
+                    buffer,
+                    frame_w,
+                    frame_h,
+                    offset_x,
+                    offset_y,
+                    thumb.width() as f32,
+                    thumb.height() as f32,
+                    10.0,
                 );
             }
         }

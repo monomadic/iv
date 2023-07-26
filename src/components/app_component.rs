@@ -21,19 +21,17 @@ impl Component for AppComponent {
             Msg::Resized(width, height) => {
                 self.width = *width;
                 self.height = *height;
+                self.solo_view.update(msg, state, config);
+                self.index_view.update(msg, state, config);
             }
             _ => (),
         }
 
-        self.solo_view.update(msg, state, config);
-        self.index_view.update(msg, state, config);
-        true
-
         // update children
-        // match state.layout_state {
-        //     LayoutState::SingleView => self.solo_view.update(msg, state, config),
-        //     LayoutState::IndexView => self.index_view.update(msg, state, config),
-        // }
+        match state.layout_state {
+            LayoutState::SingleView => self.solo_view.update(msg, state, config),
+            LayoutState::IndexView => self.index_view.update(msg, state, config),
+        }
     }
 
     fn draw(

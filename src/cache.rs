@@ -9,8 +9,8 @@ use image::DynamicImage;
 pub struct ImageCache(HashMap<String, DynamicImage>);
 
 impl ImageCache {
-    pub fn get(&self, key: &str, width: u32, height: u32) -> Option<&DynamicImage> {
-        let hash: String = self.hash(key, width, height);
+    pub fn get(&self, key: &str, width: u32) -> Option<&DynamicImage> {
+        let hash: String = self.hash(key, width);
         let res = self.0.get(&hash);
         if res.is_some() {
             println!("CACHE GET [HIT]: {} ", hash);
@@ -45,7 +45,7 @@ impl ImageCache {
         width: u32,
         height: u32,
     ) -> &DynamicImage {
-        let key: String = self.hash(&key.to_string(), width, height);
+        let key = key.to_string();
         println!("CACHE PUT {}", key);
         if !self.0.contains_key(&key) {
             let image = image.resize(width, height, image::imageops::FilterType::Nearest);
@@ -55,7 +55,7 @@ impl ImageCache {
     }
 
     pub fn store<S: ToString>(&mut self, key: S, image: &DynamicImage, width: u32, height: u32) {
-        let key: String = self.hash(&key.to_string(), width, height);
+        let key: String = self.hash(&key.to_string(), width);
         println!("CACHE PUT {}", key);
         let image = image.resize(width, height, image::imageops::FilterType::Nearest);
         self.0.insert(key.to_string(), image);
@@ -72,8 +72,8 @@ impl ImageCache {
     /// # Returns
     ///
     /// A String that is used as the hash key for a cache entry.
-    fn hash(&self, key: &str, width: u32, height: u32) -> String {
-        format!("{}{}{}", key, width, height)
+    fn hash(&self, key: &str, width: u32) -> String {
+        format!("{}{}", key, width)
     }
 }
 

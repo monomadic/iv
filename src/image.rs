@@ -29,6 +29,7 @@ pub fn border(
     height: f32,
     border_width: f32,
 ) {
+    println!("{}x{}", width, height);
     let bw = border_width.min(width / 2.0).min(height / 2.0);
 
     let start_x = x.max(0.0) as usize;
