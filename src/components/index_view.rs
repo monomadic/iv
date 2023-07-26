@@ -1,5 +1,4 @@
-use image::{DynamicImage, GenericImage, Pixel};
-use imageproc::{drawing::draw_filled_rect_mut, rect::Rect};
+use image::GenericImage;
 use pixels::Pixels;
 
 use crate::{config::Config, msg::Msg, state::AppState};
@@ -37,31 +36,35 @@ impl Component for IndexView {
         true
     }
 
-    fn draw(&mut self, state: &AppState, config: &Config, surface: &mut Pixels) {
-        let cols = state.cols as f32;
-        let rows = self.height as f32 / (self.width as f32 / cols);
+    fn draw(&mut self, state: &AppState, config: &Config, buffer: &mut Pixels) {
         let padding = config.thumbnail_padding;
 
-        let component_width = self.width as f32;
-        let component_height = self.height as f32;
+        let cols = state.cols as f32;
+        let rows = self.height as f32 / (self.width as f32 / cols);
 
-        let thumbnail_width = component_width / cols;
-        let thumbnail_height = component_height / rows;
+        let frame_w = self.width as f32;
+        let frame_h = self.height as f32;
 
-        // let selected = state.cursor() as f32;
+        let thumbnail_width = frame_w / cols;
+        let thumbnail_height = frame_h / rows;
 
-        let mut buffer = image::ImageBuffer::new(self.width, self.height);
+        let selected = state.cursor();
+        let rowskip = self.rowskip(selected, cols);
+
+        buffer.clear_color(pixels::wgpu::Color::BLACK);
+        crate::image::clear(buffer);
 
         // get a framebuffer from the pixels context
-        let frame = surface.frame_mut();
-        // draw the thumb background
-        // black bg
-        for pixel in frame.chunks_exact_mut(4) {
-            pixel.copy_from_slice(&[0, 0, 0, 255]);
-        }
+        // let frame = surface.frame_mut();
+        // let mut rgba = image::Rgba::from_slice(frame);
 
         // the maximum amount of images displayed on screen
         // let images_max = cols as usize * (self.height as f64 / thumb_height as f64).ceil() as usize;
+
+        // let mut buffer = image::ImageBuffer::new(self.width, self.height);
+
+        // let mut image_buffer: ImageBuffer<Rgba<u8>, Vec<u8>> =
+        //     ImageBuffer::from_raw(self.width, self.height, frame.into()).unwrap();
 
         for (i, path) in self
             .visible_images(&state, cols, padding as f32)
@@ -77,64 +80,37 @@ impl Component for IndexView {
                 .get(path, width as u32, height as u32)
                 .expect("image to be cached");
 
-            // Draw rounded corners for the thumbnail
-            // let mut thumb = thumb.clone();
-            // let corner_radius = 10; // Adjust the radius as per your preference
+            // let thumb = crate::image::inset_border(thumb.clone(), 10.0);
 
             let i = i as f32;
 
             // calculate x position
-            let x_offset = (i % cols) * thumbnail_width;
+            let offset_x = (i % cols) * thumbnail_width;
             // calculate y position
-            let y_offset = (i / cols).floor() * thumbnail_height;
+            let offset_y = (i / cols).floor() * thumbnail_height;
 
             // center horizontally
-            let x_offset = x_offset + (thumbnail_width - thumb.width() as f32) / 2.0;
+            let offset_x = offset_x + (thumbnail_width - thumb.width() as f32) / 2.0;
             // center vertically
-            let y_offset = y_offset + (thumbnail_height - thumb.height() as f32) / 2.0;
+            let offset_y = offset_y + (thumbnail_height - thumb.height() as f32) / 2.0;
 
-            buffer
-                .copy_from(&thumb.to_rgba8(), x_offset as u32, y_offset as u32)
-                .unwrap();
+            // copy current image to buffer
+            crate::image::copy_with_offset(
+                &thumb,
+                buffer,
+                frame_w as u32,
+                frame_h as u32,
+                offset_x as u32,
+                offset_y as u32,
+            );
 
-            // // Copy thumbnail to the framebuffer
-            //
-            // for (x, y, pixel) in thumb.pixels() {
-            //     // // Draw border for the selected thumbnail
-            //     // if i + (rowskip * cols) == selected {
-            //     //     let border_color = [255, 255, 255, 255]; // White
-            //     //     let cols = cols as u32;
-            //     //     let i = i as u32;
-            //     //     let component_width = component_width as u32;
-            //     //     let thumbnail_width = thumbnail_width as u32;
-            //     //     let thumbnail_height = thumbnail_height as u32;
-            //     //     let rowskip = self.rowskip(state.collection.cursor, state.cols as f32);
-            //     //     let border_thickness = config.thumbnail_border_thickness;
-            //     //
-            //     //     for y in 0..thumbnail_height {
-            //     //         for x in 0..thumbnail_width {
-            //     //             if x < border_thickness
-            //     //                 || x >= thumb_width - border_thickness
-            //     //                 || y < border_thickness
-            //     //                 || y >= thumb_height - border_thickness
-            //     //             {
-            //     //                 let position = (((y + (i / cols) * thumb_height) * component_width)
-            //     //                     + x
-            //     //                     + (i % cols) * thumb_width)
-            //     //                     as usize;
-            //     //
-            //     //                 // Each pixel has 4 channels (RGBA), so we multiply the position by 4.
-            //     //                 if position * 4 + 4 <= pixels_frame.len() {
-            //     //                     pixels_frame[(position * 4)..(position * 4 + 4)]
-            //     //                         .copy_from_slice(&border_color);
-            //     //                 }
-            //     //             }
-            //     //         }
-            //     //     }
-            //     // }
-            // }
+            // Draw border for the selected thumbnail
+            if i == selected as f32 + (rowskip * cols) {
+                crate::image::border(
+                    buffer, frame_w, frame_h, offset_x, offset_y, width, height, 10.0,
+                );
+            }
         }
-        frame.copy_from_slice(&buffer.into_raw())
     }
 }
 

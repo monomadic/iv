@@ -6,8 +6,13 @@ use super::Component;
 pub struct ImageComponent {
     width: u32,
     height: u32,
-    key: String,
+    // zoom: Zoom,
 }
+
+// pub enum Zoom {
+//     FitScreen,
+//     ActualSize,
+// }
 
 impl Component for ImageComponent {
     fn update(&mut self, msg: &Msg, state: &mut AppState, _config: &Config) -> bool {
@@ -35,6 +40,8 @@ impl Component for ImageComponent {
         _config: &crate::config::Config,
         pixels: &mut pixels::Pixels,
     ) {
-        crate::image::copy_image(state.current_image(), pixels, self.width, self.height);
+        pixels.clear_color(pixels::wgpu::Color::BLACK);
+        crate::image::clear(pixels);
+        crate::image::copy_and_resize(state.current_image(), pixels, self.width, self.height);
     }
 }

@@ -72,23 +72,6 @@ impl AppState {
         self.cache.store(key, &original, width, height)
     }
 
-    pub fn precache_thumbnails(&mut self, width: u32, skip: usize, len: usize) {
-        for path in self.collection.keys.iter().skip(skip).take(len) {
-            let image = self.get_original(path);
-            self.cache.store(path, &image.clone(), width, width);
-        }
-    }
-
-    // pub fn paginated_thumbnails(&self, width: u32, skip: usize, len: usize) -> Vec<&DynamicImage> {
-    //     self.collection
-    //         .keys
-    //         .iter()
-    //         .skip(skip)
-    //         .take(len)
-    //         .map(|path| self.thumbnail(path, width))
-    //         .collect()
-    // }
-
     pub fn get_original(&self, path: &str) -> &DynamicImage {
         self.files
             .get(&PathBuf::from(path))
@@ -99,10 +82,10 @@ impl AppState {
         self.get_original(self.collection.current())
     }
 
-    /// Get a precached thumbnail or return the placeholder image.
-    pub fn thumbnail(&self, path: &PathBuf, width: u32) -> &DynamicImage {
-        self.cache
-            .get(path.to_str().unwrap(), width, width)
-            .unwrap_or(&self.placeholder)
-    }
+    // /// Get a precached thumbnail or return the placeholder image.
+    // pub fn thumbnail(&self, path: &PathBuf, width: u32) -> &DynamicImage {
+    //     self.cache
+    //         .get(path.to_str().unwrap(), width, width)
+    //         .unwrap_or(&self.placeholder)
+    // }
 }
