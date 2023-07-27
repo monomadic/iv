@@ -10,8 +10,8 @@ pub struct ImageComponent {
 }
 
 // pub enum Zoom {
-//     FitScreen,
-//     ActualSize,
+//     FitToScreen,
+//     Zoom(f32),
 // }
 
 impl Component for ImageComponent {
@@ -20,18 +20,15 @@ impl Component for ImageComponent {
             Msg::Resized(width, height) => {
                 self.width = *width;
                 self.height = *height;
-                true
             }
             Msg::MoveLeft | Msg::MoveUp => {
                 state.collection.decrement(1);
-                true
             }
             Msg::MoveRight | Msg::MoveDown => {
                 state.collection.increment(1);
-                true
             }
-            _ => false,
         }
+        true
     }
 
     fn draw(

@@ -1,4 +1,3 @@
-use image::GenericImageView;
 use minifb::{Key, Window, WindowOptions};
 use std::{env, path::Path};
 

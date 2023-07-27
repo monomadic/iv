@@ -1,23 +1,23 @@
-use image::{DynamicImage, GenericImage, GenericImageView};
+use image::{DynamicImage, GenericImageView};
 use pixels::Pixels;
 
-/// Creates an inset border on an image without changing its size.
-pub fn inset_border(mut image: DynamicImage, border_width: f32) -> DynamicImage {
-    let (width, height) = image.dimensions();
-    let bw = (border_width as u32).min(width / 2).min(height / 2);
-
-    let border_color = image::Rgba([255, 255, 255, 255]); // white color for the border
-
-    for y in 0..height {
-        for x in 0..width {
-            if x < bw || x >= width - bw || y < bw || y >= height - bw {
-                image.put_pixel(x, y, border_color);
-            }
-        }
-    }
-
-    image
-}
+// /// Creates an inset border on an image without changing its size.
+// pub fn inset_border(mut image: DynamicImage, border_width: f32) -> DynamicImage {
+//     let (width, height) = image.dimensions();
+//     let bw = (border_width as u32).min(width / 2).min(height / 2);
+//
+//     let border_color = image::Rgba([255, 255, 255, 255]); // white color for the border
+//
+//     for y in 0..height {
+//         for x in 0..width {
+//             if x < bw || x >= width - bw || y < bw || y >= height - bw {
+//                 image.put_pixel(x, y, border_color);
+//             }
+//         }
+//     }
+//
+//     image
+// }
 
 pub fn border(
     frame: &mut Pixels,

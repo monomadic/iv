@@ -71,7 +71,7 @@ impl Component for IndexView {
             .enumerate()
         {
             // Retrieve thumbnail from the cache
-            let (width, height) =
+            let (width, _height) =
                 self.inner_image_dimensions(cols as f32, config.thumbnail_padding as f32);
 
             let thumb = state
