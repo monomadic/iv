@@ -54,7 +54,7 @@ impl AppState {
 
     pub fn cache(&mut self, key: &str, width: u32, height: u32) {
         let original = self.get_original(&key).clone(); // FIXME: do not clone here
-        self.cache.store(key, &original, width, height)
+        self.cache.write(key, &original, width, height)
     }
 
     pub fn get_original(&self, path: &str) -> &DynamicImage {

@@ -9,6 +9,21 @@ use image::DynamicImage;
 pub struct ImageCache(HashMap<String, DynamicImage>);
 
 impl ImageCache {
+    /// Write to the cache if no entry exists
+    pub fn write(&mut self, key: &str, image: &DynamicImage, width: u32, height: u32) {
+        let hash: String = self.hash(key, width);
+        let res = self.0.get(&hash);
+        if !res.is_some() {
+            println!("CACHE WRITE: {} ", hash);
+            if image.width() != width {
+                let image = image.resize(width, height, image::imageops::FilterType::Nearest);
+                self.0.insert(hash, image);
+            } else {
+                self.0.insert(hash, image.to_owned());
+            }
+        }
+    }
+
     pub fn get(&self, key: &str, width: u32) -> Option<&DynamicImage> {
         let hash: String = self.hash(key, width);
         let res = self.0.get(&hash);
@@ -18,6 +33,14 @@ impl ImageCache {
             println!("CACHE GET [MISS]: {} ", hash);
         }
         res
+    }
+
+    /// Write to the cache regardless of any existing entry
+    pub fn overwrite(&mut self, key: &str, image: &DynamicImage, width: u32, height: u32) {
+        let hash: String = self.hash(key, width);
+        println!("CACHE OVERWRITE {}", key);
+        let image = image.resize(width, height, image::imageops::FilterType::Nearest);
+        self.0.insert(hash, image);
     }
 
     /// Stores an image in the cache and returns a reference to the cached image.
@@ -54,13 +77,6 @@ impl ImageCache {
         self.0.get(&key).unwrap()
     }
 
-    pub fn store<S: ToString>(&mut self, key: S, image: &DynamicImage, width: u32, height: u32) {
-        let key: String = self.hash(&key.to_string(), width);
-        println!("CACHE PUT {}", key);
-        let image = image.resize(width, height, image::imageops::FilterType::Nearest);
-        self.0.insert(key.to_string(), image);
-    }
-
     /// Creates the hash used as the key for each cache entry.
     ///
     /// # Arguments
@@ -73,7 +89,7 @@ impl ImageCache {
     ///
     /// A String that is used as the hash key for a cache entry.
     fn hash(&self, key: &str, width: u32) -> String {
-        format!("{}{}", key, width)
+        format!("{}?{}", key, width)
     }
 }
 
