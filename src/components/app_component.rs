@@ -16,21 +16,21 @@ pub struct AppComponent {
 }
 
 impl Component for AppComponent {
-    fn update(&mut self, msg: &Msg, state: &mut AppState, config: &Config) -> bool {
+    fn update(&mut self, state: &mut AppState, config: &Config, msg: &Msg) -> bool {
         match msg {
             Msg::Resized(width, height) => {
                 self.width = *width;
                 self.height = *height;
-                self.solo_view.update(msg, state, config);
-                self.index_view.update(msg, state, config);
+                self.solo_view.update(state, config, msg);
+                self.index_view.update(state, config, msg);
             }
             _ => (),
         }
 
         // update children
         match state.layout_state {
-            LayoutState::SingleView => self.solo_view.update(msg, state, config),
-            LayoutState::IndexView => self.index_view.update(msg, state, config),
+            LayoutState::SingleView => self.solo_view.update(state, config, msg),
+            LayoutState::IndexView => self.index_view.update(state, config, msg),
         }
     }
 

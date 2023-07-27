@@ -15,7 +15,7 @@ pub struct ImageComponent {
 // }
 
 impl Component for ImageComponent {
-    fn update(&mut self, msg: &Msg, state: &mut AppState, _config: &Config) -> bool {
+    fn update(&mut self, state: &mut AppState, _config: &Config, msg: &Msg) -> bool {
         match msg {
             Msg::Resized(width, height) => {
                 self.width = *width;

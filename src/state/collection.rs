@@ -1,8 +1,18 @@
 #[derive(Default, Clone, Debug)]
 pub struct AssetCollection {
     pub keys: Vec<String>,
-    // TODO: make private cursor, use a u32
     pub cursor: usize,
+}
+
+impl TryFrom<&str> for AssetCollection {
+    type Error = std::io::Error;
+
+    fn try_from(path: &str) -> Result<Self, Self::Error> {
+        // let files = crate::filesystem::get_files_from_directory(path)?;
+        let keys = crate::filesystem::get_images_from_dir(path).expect("could not read dir");
+
+        Ok(Self { keys, cursor: 0 })
+    }
 }
 
 impl AssetCollection {
@@ -38,49 +48,6 @@ impl AssetCollection {
             self.cursor = 0;
         }
     }
-
-    // pub fn thumbs(&self) -> Vec<&DynamicImage> {
-    //     self.current_collection
-    //         .iter()
-    //         .map(|path| {
-    //             // for now, returning originals
-    //             self.current_collection
-    //                 .get(path)
-    //                 .unwrap_or(&self.placeholder)
-    //             // let hash = self.hash(&path, thumb_width);
-    //             // if let Some(cached_thumb) = self.cache.get(&hash) {
-    //             //     Some(cached_thumb.clone())
-    //             // } else {
-    //             //     let processed_thumb =
-    //             //         process_image(path, thumb_width, config.thumbnail_padding)?;
-    //             //     self.cache.insert(hash, processed_thumb.clone());
-    //             //     Some(processed_thumb)
-    //             // }
-    //         })
-    //         .collect()
-    // }
-
-    // /// Get the next asset
-    // pub fn prev(&mut self) -> Option<&PathBuf> {
-    //     if self.cursor == 0 {
-    //         self.cursor = self.assets.len() - 1;
-    //     } else {
-    //         self.cursor -= 1;
-    //     }
-    //
-    //     self.assets.get(self.cursor)
-    // }
-    //
-    // /// Get the next asset
-    // pub fn next(&mut self) -> Option<&PathBuf> {
-    //     if self.cursor == self.assets.len() - 1 {
-    //         self.cursor = 0;
-    //     } else {
-    //         self.cursor += 1;
-    //     }
-    //
-    //     self.assets.get(self.cursor)
-    // }
 }
 
 #[cfg(test)]

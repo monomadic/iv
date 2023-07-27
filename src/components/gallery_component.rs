@@ -21,7 +21,7 @@ impl GalleryComponent {
 }
 
 impl Component for GalleryComponent {
-    fn update(&mut self, msg: &Msg, state: &mut AppState, config: &crate::config::Config) -> bool {
+    fn update(&mut self, state: &mut AppState, config: &crate::config::Config, msg: &Msg) -> bool {
         // move the selected thumbnail
         match msg {
             Msg::MoveUp => state.collection.decrement(state.cols as usize),

@@ -14,8 +14,6 @@ fn main() {
     let image = image::open(&Path::new(&file)).unwrap();
     let width = image.width() as usize;
     let height = image.height() as usize;
-    println!("dimensions {:?} {:?}", image.dimensions(), image.color());
-
     let u32_buffer: Vec<u32> = image
         .as_bytes()
         .chunks(3)
