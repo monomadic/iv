@@ -1,4 +1,4 @@
-use crate::filesystem;
+use crate::{error::IVError, filesystem};
 
 #[derive(Default, Clone, Debug)]
 pub struct AssetCollection {
@@ -7,23 +7,27 @@ pub struct AssetCollection {
 }
 
 impl TryFrom<&str> for AssetCollection {
-    type Error = std::io::Error;
+    type Error = IVError;
 
     fn try_from(p: &str) -> Result<Self, Self::Error> {
+        Self::new(p)
+    }
+}
+
+impl AssetCollection {
+    pub fn new(path: &str) -> Result<Self, IVError> {
         // ensure path is standardised + absolute
-        let path = std::fs::canonicalize(p)?;
+        let path = std::fs::canonicalize(path)?;
         let keys = filesystem::get_images_from_dir(&path).expect("could not read dir");
         let mut collection = AssetCollection { keys, cursor: 0 };
 
-        if std::path::PathBuf::from(p).is_file() {
+        if path.is_file() {
             collection.set_current(path.to_str().expect("path to convert"));
         };
 
         Ok(collection)
     }
-}
 
-impl AssetCollection {
     pub fn set_current(&mut self, current: &str) {
         // find the current index
         let index = self.keys.iter().position(|p| p == current);
