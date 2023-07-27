@@ -23,11 +23,6 @@ impl AppState {
         collection: AssetCollection,
         default_columns: u32,
     ) -> Result<Self> {
-        // let path = path.as_ref();
-        // load and validate images into memory
-        // let image_paths = get_images_from_directory(&path)?;
-        // let image_paths = crate::filesystem::get_files_in_folder(&path)?;
-
         // read files into memory
         let mut files = HashMap::new();
         for image_path in &collection.keys {
@@ -35,11 +30,6 @@ impl AppState {
                 files.insert(image_path.clone(), image);
             }
         }
-
-        // let mut collection = AssetCollection::new(image_paths.into());
-        // if path.is_file() {
-        //     collection.set_current(path.to_str().unwrap());
-        // }
 
         let placeholder = image::load_from_memory(include_bytes!("../../assets/placeholder.jpg"))
             .expect("placeholder was invalid");
@@ -74,11 +64,4 @@ impl AppState {
     pub fn current_image(&self) -> &DynamicImage {
         self.get_original(self.collection.current())
     }
-
-    // /// Get a precached thumbnail or return the placeholder image.
-    // pub fn thumbnail(&self, path: &PathBuf, width: u32) -> &DynamicImage {
-    //     self.cache
-    //         .get(path.to_str().unwrap(), width, width)
-    //         .unwrap_or(&self.placeholder)
-    // }
 }

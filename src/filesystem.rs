@@ -11,9 +11,9 @@ pub fn get_images_from_glob(arg: &str) -> Result<Vec<PathBuf>> {
         .collect())
 }
 
-pub fn get_images_from_directory<P: AsRef<Path>>(path: P) -> Result<Vec<PathBuf>> {
-    get_target_directory(path.as_ref()).and_then(get_image_paths)
-}
+// pub fn get_images_from_directory<P: AsRef<Path>>(path: P) -> Result<Vec<PathBuf>> {
+//     get_target_directory(path.as_ref()).and_then(get_image_paths)
+// }
 
 pub fn get_images_from_dir<P: AsRef<Path>>(path: P) -> Result<Vec<String>> {
     get_target_directory(path.as_ref()).and_then(get_image_keys)
@@ -40,7 +40,13 @@ fn get_target_directory(path: &Path) -> Result<PathBuf> {
         Ok(path.to_owned())
     } else if path.is_file() {
         path.parent()
-            .map(Path::to_owned)
+            .map(|p| {
+                if p == Path::new("") {
+                    std::env::current_dir().unwrap()
+                } else {
+                    p.to_path_buf()
+                }
+            })
             .ok_or(IVError::Static("Unable to get the parent directory"))
     } else {
         Err(IVError::Static("Invalid path argument"))
