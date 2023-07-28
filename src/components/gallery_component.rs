@@ -33,6 +33,9 @@ impl Component for GalleryComponent {
                 self.height = *height;
                 // heat up the thumb cache
             }
+            Msg::KeyPress(key) => match key {
+                _ => (),
+            },
         }
 
         true

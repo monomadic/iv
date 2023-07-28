@@ -11,6 +11,7 @@ pub struct ImageComponent {
 
 // pub enum Zoom {
 //     FitToScreen,
+//     ZoomToFit,
 //     Zoom(f32),
 // }
 
@@ -27,6 +28,9 @@ impl Component for ImageComponent {
             Msg::MoveRight | Msg::MoveDown => {
                 state.collection.increment(1);
             }
+            Msg::KeyPress(key) => match key {
+                _ => (),
+            },
         }
         true
     }

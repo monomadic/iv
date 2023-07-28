@@ -21,17 +21,18 @@ impl Component for IndexView {
             Msg::Resized(width, height) => {
                 self.width = *width;
                 self.height = *height;
-                // precache
-                for key in
-                    self.visible_images(&state, state.cols as f32, config.thumbnail_padding as f32)
-                {
-                    let (width, height) = self
-                        .inner_image_dimensions(state.cols as f32, config.thumbnail_padding as f32);
-                    state.cache(&key, width as u32, height as u32);
-                }
             }
+            Msg::KeyPress(key) => match key {
+                _ => (),
+            },
         }
 
+        // precache visible images
+        for key in self.visible_images(&state, state.cols as f32, config.thumbnail_padding as f32) {
+            let (width, height) =
+                self.inner_image_dimensions(state.cols as f32, config.thumbnail_padding as f32);
+            state.cache(&key, width as u32, height as u32);
+        }
         true
     }
 
@@ -53,18 +54,6 @@ impl Component for IndexView {
         buffer.clear_color(pixels::wgpu::Color::BLACK);
         crate::image::clear(buffer);
 
-        // get a framebuffer from the pixels context
-        // let frame = surface.frame_mut();
-        // let mut rgba = image::Rgba::from_slice(frame);
-
-        // the maximum amount of images displayed on screen
-        // let images_max = cols as usize * (self.height as f64 / thumb_height as f64).ceil() as usize;
-
-        // let mut buffer = image::ImageBuffer::new(self.width, self.height);
-
-        // let mut image_buffer: ImageBuffer<Rgba<u8>, Vec<u8>> =
-        //     ImageBuffer::from_raw(self.width, self.height, frame.into()).unwrap();
-
         for (i, path) in self
             .visible_images(&state, cols, padding as f32)
             .iter()
@@ -78,8 +67,6 @@ impl Component for IndexView {
                 .cache
                 .get(path, width as u32)
                 .expect("image to be cached");
-
-            // let thumb = crate::image::inset_border(thumb.clone(), 10.0);
 
             let i = i as f32;
 
@@ -103,8 +90,10 @@ impl Component for IndexView {
                 offset_y as u32,
             );
 
+            println!("{}, {}, {}", selected, rowskip, cols);
+
             // Draw border for the selected thumbnail
-            if i == selected as f32 + (rowskip * cols) {
+            if i == selected as f32 - (rowskip * cols) {
                 crate::image::border(
                     buffer,
                     frame_w,
@@ -113,7 +102,7 @@ impl Component for IndexView {
                     offset_y,
                     thumb.width() as f32,
                     thumb.height() as f32,
-                    10.0,
+                    config.thumbnail_border_thickness as f32,
                 );
             }
         }
@@ -147,16 +136,12 @@ impl IndexView {
         self.width as f32 / cols - padding * 2.0
     }
 
-    // fn get_thumb(&self, path: &str, cols: u32) -> &DynamicImage {}
-
     fn rowskip(&self, cursor: usize, cols: f32) -> f32 {
-        // let total_rows = (total_assets as f64 / cols as f64).ceil() as u32;
-        let col_width = (self.width as f32 / cols).floor();
         let current_row = (cursor as f32 / cols) + 1.0;
-        let rows_on_screen = self.height as f32 / col_width;
+        let rows_visible = self.height as f32 / (self.width as f32 / cols);
 
-        if current_row > rows_on_screen {
-            current_row - rows_on_screen as f32
+        if current_row > rows_visible {
+            (current_row - rows_visible + 1.0).floor()
         } else {
             0.0
         }

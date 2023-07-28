@@ -65,79 +65,85 @@ impl Window {
                                 ..
                             },
                         ..
-                    } => match virtual_code {
-                        Escape | Q => control_flow.set_exit(),
-                        VirtualKeyCode::Key1 => {
-                            state.cols = 3;
-                            window.request_redraw();
-                        }
-                        VirtualKeyCode::Key2 => {
-                            state.cols = 4;
-                            window.request_redraw();
-                        }
-                        VirtualKeyCode::Key3 => {
-                            state.cols = 5;
-                            window.request_redraw();
-                        }
-                        VirtualKeyCode::Key4 => {
-                            state.cols = 6;
-                            window.request_redraw();
-                        }
-                        VirtualKeyCode::Key5 => {
-                            state.cols = 7;
-                            window.request_redraw();
-                        }
-                        VirtualKeyCode::Key6 => {
-                            state.cols = 8;
-                            window.request_redraw();
-                        }
-                        VirtualKeyCode::Key7 => {
-                            state.cols = 9;
-                            window.request_redraw();
-                        }
-                        VirtualKeyCode::Minus => {
-                            state.cols += 1;
-                            window.request_redraw();
-                        }
-                        VirtualKeyCode::Equals => {
-                            if state.cols > 2 {
-                                state.cols -= 1;
-                            }
-                            window.request_redraw();
-                        }
-                        VirtualKeyCode::Key8 => {
-                            state.cols = 10;
-                            window.request_redraw();
-                        }
-                        VirtualKeyCode::Space | VirtualKeyCode::Return => {
-                            state.toggle_layout();
-                            window.request_redraw();
-                        }
-                        VirtualKeyCode::F => {
-                            window.set_simple_fullscreen(!window.simple_fullscreen());
-                        }
-                        VirtualKeyCode::H | VirtualKeyCode::Left => {
-                            if app.update(&mut state, &config, &Msg::MoveLeft) {
+                    } => {
+                        match virtual_code {
+                            Escape | Q => control_flow.set_exit(),
+                            VirtualKeyCode::Key1 => {
+                                state.cols = 3;
                                 window.request_redraw();
                             }
-                        }
-                        VirtualKeyCode::L | VirtualKeyCode::Right => {
-                            if app.update(&mut state, &config, &Msg::MoveRight) {
+                            VirtualKeyCode::Key2 => {
+                                state.cols = 4;
                                 window.request_redraw();
                             }
-                        }
-                        VirtualKeyCode::J | VirtualKeyCode::Down => {
-                            if app.update(&mut state, &config, &Msg::MoveDown) {
+                            VirtualKeyCode::Key3 => {
+                                state.cols = 5;
                                 window.request_redraw();
                             }
-                        }
-                        VirtualKeyCode::K | VirtualKeyCode::Up => {
-                            if app.update(&mut state, &config, &Msg::MoveUp) {
+                            VirtualKeyCode::Key4 => {
+                                state.cols = 6;
                                 window.request_redraw();
                             }
+                            VirtualKeyCode::Key5 => {
+                                state.cols = 7;
+                                window.request_redraw();
+                            }
+                            VirtualKeyCode::Key6 => {
+                                state.cols = 8;
+                                window.request_redraw();
+                            }
+                            VirtualKeyCode::Key7 => {
+                                state.cols = 9;
+                                window.request_redraw();
+                            }
+                            VirtualKeyCode::Minus => {
+                                state.cols += 1;
+                                window.request_redraw();
+                            }
+                            VirtualKeyCode::Equals => {
+                                if state.cols > 2 {
+                                    state.cols -= 1;
+                                }
+                                window.request_redraw();
+                            }
+                            VirtualKeyCode::Key8 => {
+                                state.cols = 10;
+                                window.request_redraw();
+                            }
+                            VirtualKeyCode::Space | VirtualKeyCode::Return => {
+                                state.toggle_layout();
+                                window.request_redraw();
+                            }
+                            VirtualKeyCode::F => {
+                                window.set_simple_fullscreen(!window.simple_fullscreen());
+                            }
+                            VirtualKeyCode::H | VirtualKeyCode::Left => {
+                                if app.update(&mut state, &config, &Msg::MoveLeft) {
+                                    window.request_redraw();
+                                }
+                            }
+                            VirtualKeyCode::L | VirtualKeyCode::Right => {
+                                if app.update(&mut state, &config, &Msg::MoveRight) {
+                                    window.request_redraw();
+                                }
+                            }
+                            VirtualKeyCode::J | VirtualKeyCode::Down => {
+                                if app.update(&mut state, &config, &Msg::MoveDown) {
+                                    window.request_redraw();
+                                }
+                            }
+                            VirtualKeyCode::K | VirtualKeyCode::Up => {
+                                if app.update(&mut state, &config, &Msg::MoveUp) {
+                                    window.request_redraw();
+                                }
+                            }
+                            _ => (),
+                        };
+
+                        if app.update(&mut state, &config, &Msg::KeyPress(virtual_code)) {
+                            window.request_redraw();
                         }
-                        _ => (),
-                    },
+                    }
                     _ => (),
                 },
                 _ => {}
