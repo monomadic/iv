@@ -15,4 +15,7 @@ pub enum IVError {
 
     #[error(transparent)]
     IO(#[from] std::io::Error),
+
+    #[error(transparent)]
+    PixelsError(#[from] pixels::Error),
 }

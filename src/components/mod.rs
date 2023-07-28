@@ -10,10 +10,6 @@ mod index_view;
 pub use app_component::AppComponent;
 pub use index_view::IndexView;
 
-// TODO: draw should contain the width + height?
-// - prevents natural caching
-// - but creates natural immutable component state
-
 pub struct Rect {
     pub width: f32,
     pub height: f32,

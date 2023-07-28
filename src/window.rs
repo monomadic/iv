@@ -20,7 +20,7 @@ pub struct Window;
 impl Window {
     pub fn new(mut state: AppState, mut app: AppComponent) -> Result<()> {
         let event_loop = EventLoop::new();
-        // keyboard modifier state
+        // Keyboard modifier state
         let mut modifiers = ModifiersState::default();
         let window = WindowBuilder::new()
             .with_title("iv")
@@ -28,18 +28,18 @@ impl Window {
             .build(&event_loop)
             .expect("winit failed to initialize window");
 
-        // go fullscreen
+        // Go fullscreen
         window.set_simple_fullscreen(true);
 
         let mut size = window.inner_size().into();
         app.update(&mut state, &size, &Msg::Init);
 
+        // Initialize Pixels
         let mut pixels = {
             let surface_texture =
                 SurfaceTexture::new(size.width as u32, size.height as u32, &window);
-            Pixels::new(size.width as u32, size.height as u32, surface_texture)
-        }
-        .expect("pixels err"); // TODO: coalesce
+            Pixels::new(size.width as u32, size.height as u32, surface_texture)?
+        };
         pixels.clear_color(pixels::wgpu::Color::BLACK);
 
         event_loop.run(move |event, _elwt, control_flow| {
