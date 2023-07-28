@@ -1,6 +1,6 @@
 use pixels::Pixels;
 
-use crate::{config::Config, msg::Msg, state::AppState};
+use crate::{msg::Msg, state::AppState};
 
 mod app_component;
 mod image_component;
@@ -14,7 +14,7 @@ pub use index_view::IndexView;
 // - but creates natural immutable component state
 
 pub trait Component {
-    fn draw(&mut self, state: &AppState, config: &Config, pixels: &mut Pixels);
-    fn update(&mut self, state: &mut AppState, config: &Config, msg: &Msg) -> bool;
+    fn draw(&mut self, state: &AppState, pixels: &mut Pixels);
+    fn update(&mut self, state: &mut AppState, msg: &Msg) -> bool;
     // fn children(&self) -> Vec<&Self>;
 }

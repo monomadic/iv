@@ -1,7 +1,7 @@
 use image::io::Reader as ImageReader;
 use image::DynamicImage;
 
-use crate::{cache::ImageCache, prelude::*};
+use crate::{cache::ImageCache, config::Config, prelude::*};
 use std::collections::HashMap;
 
 use super::{collection::AssetCollection, LayoutState};
@@ -15,13 +15,16 @@ pub struct AppState {
     /// number of columns in index view
     pub cols: u32,
     pub placeholder: DynamicImage,
+
+    pub thumbnail_padding: u32,
+    pub thumbnail_border_thickness: u32,
 }
 
 impl AppState {
     pub fn new(
         layout_state: LayoutState,
         collection: AssetCollection,
-        default_columns: u32,
+        config: Config,
     ) -> Result<Self> {
         // read files into memory
         let mut files = HashMap::new();
@@ -39,8 +42,10 @@ impl AppState {
             collection,
             layout_state,
             cache: ImageCache::default(),
-            cols: default_columns,
+            cols: config.index_columns,
             placeholder,
+            thumbnail_padding: config.thumbnail_padding,
+            thumbnail_border_thickness: config.thumbnail_border_thickness,
         })
     }
 

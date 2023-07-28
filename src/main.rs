@@ -10,9 +10,6 @@ mod state;
 mod window;
 
 fn main() -> Result<(), error::IVError> {
-    // Get default configuration
-    let config = config::Config::default();
-
     // Parse cli arguments
     let path: &str = &std::env::args().nth(1).unwrap_or(".".into());
 
@@ -22,12 +19,15 @@ fn main() -> Result<(), error::IVError> {
     // Create a collection of images from the input path
     let collection = state::AssetCollection::try_from(path)?;
 
+    // Get default configuration
+    let config = config::Config::default();
+
     // Initialize application state
-    let state = state::AppState::new(layout_state, collection, config.index_columns)?;
+    let state = state::AppState::new(layout_state, collection, config)?;
 
     // Create the initial UI
     let layout = components::AppComponent::default();
 
     // Show application window
-    window::Window::new(state, layout, config)
+    window::Window::new(state, layout)
 }

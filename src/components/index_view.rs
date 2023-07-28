@@ -1,7 +1,7 @@
 use pixels::Pixels;
 use winit::event::VirtualKeyCode;
 
-use crate::{config::Config, msg::Msg, state::AppState};
+use crate::{msg::Msg, state::AppState};
 
 use super::Component;
 
@@ -12,7 +12,7 @@ pub struct IndexView {
 }
 
 impl Component for IndexView {
-    fn update(&mut self, state: &mut AppState, config: &Config, msg: &Msg) -> bool {
+    fn update(&mut self, state: &mut AppState, msg: &Msg) -> bool {
         // move the selected thumbnail
         match msg {
             Msg::MoveUp => state.collection.decrement(state.cols as usize),
@@ -36,16 +36,16 @@ impl Component for IndexView {
         }
 
         // precache visible images
-        for key in self.visible_images(&state, state.cols as f32, config.thumbnail_padding as f32) {
+        for key in self.visible_images(&state, state.cols as f32, state.thumbnail_padding as f32) {
             let (width, height) =
-                self.inner_image_dimensions(state.cols as f32, config.thumbnail_padding as f32);
+                self.inner_image_dimensions(state.cols as f32, state.thumbnail_padding as f32);
             state.cache(&key, width as u32, height as u32);
         }
         true
     }
 
-    fn draw(&mut self, state: &AppState, config: &Config, buffer: &mut Pixels) {
-        let padding = config.thumbnail_padding;
+    fn draw(&mut self, state: &AppState, buffer: &mut Pixels) {
+        let padding = state.thumbnail_padding;
 
         let cols = state.cols as f32;
         let rows = self.height as f32 / (self.width as f32 / cols);
@@ -69,7 +69,7 @@ impl Component for IndexView {
         {
             // Retrieve thumbnail from the cache
             let (width, _height) =
-                self.inner_image_dimensions(cols as f32, config.thumbnail_padding as f32);
+                self.inner_image_dimensions(cols as f32, state.thumbnail_padding as f32);
 
             let thumb = state
                 .cache
@@ -108,7 +108,7 @@ impl Component for IndexView {
                     offset_y,
                     thumb.width() as f32,
                     thumb.height() as f32,
-                    config.thumbnail_border_thickness as f32,
+                    state.thumbnail_border_thickness as f32,
                 );
             }
         }

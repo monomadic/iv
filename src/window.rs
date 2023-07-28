@@ -10,7 +10,6 @@ use winit::{
 
 use crate::{
     components::{AppComponent, Component},
-    config::Config,
     msg::Msg,
     prelude::*,
     state::AppState,
@@ -19,7 +18,7 @@ use crate::{
 pub struct Window;
 
 impl Window {
-    pub fn new(mut state: AppState, mut app: AppComponent, config: Config) -> Result<()> {
+    pub fn new(mut state: AppState, mut app: AppComponent) -> Result<()> {
         let event_loop = EventLoop::new();
         // keyboard modifier state
         let mut modifiers = ModifiersState::default();
@@ -33,7 +32,7 @@ impl Window {
         window.set_simple_fullscreen(true);
 
         let (width, height): (u32, u32) = window.inner_size().into();
-        app.update(&mut state, &config, &Msg::Resized(width, height));
+        app.update(&mut state, &Msg::Resized(width, height));
 
         let mut pixels = {
             let surface_texture = SurfaceTexture::new(width, height, &window);
@@ -49,7 +48,7 @@ impl Window {
 
             match event {
                 Event::RedrawRequested(window_id) if window_id == window.id() => {
-                    app.draw(&mut state, &config, &mut pixels);
+                    app.draw(&mut state, &mut pixels);
 
                     if pixels.render().is_err() {
                         *control_flow = ControlFlow::Exit;
@@ -119,30 +118,29 @@ impl Window {
                                 window.set_simple_fullscreen(!window.simple_fullscreen());
                             }
                             VirtualKeyCode::H | VirtualKeyCode::Left => {
-                                if app.update(&mut state, &config, &Msg::MoveLeft) {
+                                if app.update(&mut state, &Msg::MoveLeft) {
                                     window.request_redraw();
                                 }
                             }
                             VirtualKeyCode::L | VirtualKeyCode::Right => {
-                                if app.update(&mut state, &config, &Msg::MoveRight) {
+                                if app.update(&mut state, &Msg::MoveRight) {
                                     window.request_redraw();
                                 }
                             }
                             VirtualKeyCode::J | VirtualKeyCode::Down => {
-                                if app.update(&mut state, &config, &Msg::MoveDown) {
+                                if app.update(&mut state, &Msg::MoveDown) {
                                     window.request_redraw();
                                 }
                             }
                             VirtualKeyCode::K | VirtualKeyCode::Up => {
-                                if app.update(&mut state, &config, &Msg::MoveUp) {
+                                if app.update(&mut state, &Msg::MoveUp) {
                                     window.request_redraw();
                                 }
                             }
                             _ => (),
                         };
 
-                        if app.update(&mut state, &config, &Msg::KeyPress(virtual_code, modifiers))
-                        {
+                        if app.update(&mut state, &Msg::KeyPress(virtual_code, modifiers)) {
                             window.request_redraw();
                         }
                     }

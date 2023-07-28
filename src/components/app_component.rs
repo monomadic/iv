@@ -2,7 +2,6 @@ use winit::event::VirtualKeyCode;
 
 use crate::{
     components::Component,
-    config::Config,
     msg::Msg,
     state::{AppState, LayoutState},
 };
@@ -18,14 +17,14 @@ pub struct AppComponent {
 }
 
 impl Component for AppComponent {
-    fn update(&mut self, state: &mut AppState, config: &Config, msg: &Msg) -> bool {
+    fn update(&mut self, state: &mut AppState, msg: &Msg) -> bool {
         match msg {
             Msg::Resized(width, height) => {
                 self.width = *width;
                 self.height = *height;
                 // Resize events should propagate to all components.
-                self.solo_view.update(state, config, msg);
-                self.index_view.update(state, config, msg);
+                self.solo_view.update(state, msg);
+                self.index_view.update(state, msg);
             }
             Msg::KeyPress(key, _modifiers) => match key {
                 VirtualKeyCode::Space | VirtualKeyCode::Return => {
@@ -38,20 +37,15 @@ impl Component for AppComponent {
 
         // update children
         match state.layout_state {
-            LayoutState::SingleView => self.solo_view.update(state, config, msg),
-            LayoutState::IndexView => self.index_view.update(state, config, msg),
+            LayoutState::SingleView => self.solo_view.update(state, msg),
+            LayoutState::IndexView => self.index_view.update(state, msg),
         }
     }
 
-    fn draw(
-        &mut self,
-        state: &crate::state::AppState,
-        config: &crate::config::Config,
-        pixels: &mut pixels::Pixels,
-    ) {
+    fn draw(&mut self, state: &crate::state::AppState, pixels: &mut pixels::Pixels) {
         match state.layout_state {
-            LayoutState::SingleView => self.solo_view.draw(state, config, pixels),
-            LayoutState::IndexView => self.index_view.draw(state, config, pixels),
+            LayoutState::SingleView => self.solo_view.draw(state, pixels),
+            LayoutState::IndexView => self.index_view.draw(state, pixels),
         }
     }
 }

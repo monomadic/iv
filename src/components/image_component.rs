@@ -1,6 +1,6 @@
 use winit::event::VirtualKeyCode;
 
-use crate::{config::Config, msg::Msg, state::AppState};
+use crate::{msg::Msg, state::AppState};
 
 use super::Component;
 
@@ -20,7 +20,7 @@ pub enum Zoom {
 }
 
 impl Component for ImageComponent {
-    fn update(&mut self, state: &mut AppState, _config: &Config, msg: &Msg) -> bool {
+    fn update(&mut self, state: &mut AppState, msg: &Msg) -> bool {
         match msg {
             Msg::Resized(width, height) => {
                 self.width = *width;
@@ -61,12 +61,7 @@ impl Component for ImageComponent {
         true
     }
 
-    fn draw(
-        &mut self,
-        state: &crate::state::AppState,
-        _config: &crate::config::Config,
-        pixels: &mut pixels::Pixels,
-    ) {
+    fn draw(&mut self, state: &crate::state::AppState, pixels: &mut pixels::Pixels) {
         match self.zoom {
             Zoom::FitToScreen => {
                 crate::image::clear(pixels);
