@@ -1,3 +1,5 @@
+use winit::event::VirtualKeyCode;
+
 use crate::{
     components::Component,
     config::Config,
@@ -21,10 +23,14 @@ impl Component for AppComponent {
             Msg::Resized(width, height) => {
                 self.width = *width;
                 self.height = *height;
+                // Resize events should propagate to all components.
                 self.solo_view.update(state, config, msg);
                 self.index_view.update(state, config, msg);
             }
-            Msg::KeyPress(key, modifiers) => match key {
+            Msg::KeyPress(key, _modifiers) => match key {
+                VirtualKeyCode::Space | VirtualKeyCode::Return => {
+                    state.toggle_layout();
+                }
                 _ => (),
             },
             _ => (),
@@ -43,15 +49,9 @@ impl Component for AppComponent {
         config: &crate::config::Config,
         pixels: &mut pixels::Pixels,
     ) {
-        // TODO: render children automatically
         match state.layout_state {
-            LayoutState::SingleView => {
-                //crate::image::copy_image(state.current_image(), pixels, self.width, self.height);
-                self.solo_view.draw(state, config, pixels);
-            }
-            LayoutState::IndexView => {
-                self.index_view.draw(state, config, pixels);
-            }
+            LayoutState::SingleView => self.solo_view.draw(state, config, pixels),
+            LayoutState::IndexView => self.index_view.draw(state, config, pixels),
         }
     }
 }

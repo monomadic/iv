@@ -115,10 +115,6 @@ impl Window {
                                 state.cols = 10;
                                 window.request_redraw();
                             }
-                            VirtualKeyCode::Space | VirtualKeyCode::Return => {
-                                state.toggle_layout();
-                                window.request_redraw();
-                            }
                             VirtualKeyCode::F => {
                                 window.set_simple_fullscreen(!window.simple_fullscreen());
                             }

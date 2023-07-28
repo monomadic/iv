@@ -98,8 +98,6 @@ impl Component for IndexView {
                 offset_y as u32,
             );
 
-            println!("{}, {}, {}", selected, rowskip, cols);
-
             // Draw border for the selected thumbnail
             if i == selected as f32 - (rowskip * cols) {
                 crate::image::border(

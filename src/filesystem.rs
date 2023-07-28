@@ -2,7 +2,6 @@ use crate::prelude::*;
 use image::io::Reader as ImageReader;
 use std::fs;
 use std::path::{Path, PathBuf};
-// use walkdir::WalkDir;
 
 pub fn get_images_from_dir<P: AsRef<Path>>(path: P) -> Result<Vec<String>> {
     get_parent_dir(path.as_ref()).and_then(get_image_keys)
@@ -20,15 +19,11 @@ fn get_parent_dir(path: &Path) -> Result<PathBuf> {
     }
 }
 
-pub fn get_images_from_glob(arg: &str) -> Result<Vec<PathBuf>> {
-    Ok(glob::glob(&arg)?
-        .filter_map(|e| e.ok())
-        .filter(|path| is_image(&path))
-        .collect())
-}
-
-// pub fn get_images_from_directory<P: AsRef<Path>>(path: P) -> Result<Vec<PathBuf>> {
-//     get_target_directory(path.as_ref()).and_then(get_image_paths)
+// pub fn get_images_from_glob(arg: &str) -> Result<Vec<PathBuf>> {
+//     Ok(glob::glob(&arg)?
+//         .filter_map(|e| e.ok())
+//         .filter(|path| is_image(&path))
+//         .collect())
 // }
 
 // pub fn get_files_from_directory<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>> {
@@ -80,14 +75,6 @@ mod tests {
         let result = get_images_from_dir(path);
         assert!(result.is_err())
     }
-
-    // #[test]
-    // fn test_get_valid_images_from_valid_path() {
-    //     let path = Path::new("./assets");
-    //     let files = get_files_from_directory(path).unwrap();
-    //     assert!(!files.is_empty());
-    //     assert_eq!(files.len(), 12);
-    // }
 
     #[test]
     fn test_get_valid_image_from_valid_path() {

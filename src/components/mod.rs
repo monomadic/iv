@@ -3,10 +3,8 @@ use pixels::Pixels;
 use crate::{config::Config, msg::Msg, state::AppState};
 
 mod app_component;
-mod gallery_component;
 mod image_component;
 mod index_view;
-mod solo_view;
 
 pub use app_component::AppComponent;
 pub use index_view::IndexView;
