@@ -30,13 +30,11 @@ pub fn border(
     border_width: f32,
 ) {
     let bw = border_width.min(width / 2.0).min(height / 2.0);
-
     let start_x = x.max(0.0) as usize;
     let start_y = y.max(0.0) as usize;
     let end_x = (x + width).min(frame_w) as usize;
     let end_y = (y + height).min(frame_h) as usize;
     let bw_usize = bw as usize;
-
     let pixels = frame.frame_mut();
 
     for j in start_y..end_y {
