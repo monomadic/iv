@@ -23,7 +23,7 @@ impl Window {
         // keyboard modifier state
         let mut modifiers = ModifiersState::default();
         let window = WindowBuilder::new()
-            .with_title("iV")
+            .with_title("iv")
             .with_decorations(false)
             .build(&event_loop)
             .expect("winit failed to initialize window");
@@ -76,48 +76,6 @@ impl Window {
                     } => {
                         match virtual_code {
                             Escape | Q => control_flow.set_exit(),
-                            VirtualKeyCode::Key1 => {
-                                state.cols = 3;
-                                window.request_redraw();
-                            }
-                            VirtualKeyCode::Key2 => {
-                                state.cols = 4;
-                                window.request_redraw();
-                            }
-                            VirtualKeyCode::Key3 => {
-                                state.cols = 5;
-                                window.request_redraw();
-                            }
-                            VirtualKeyCode::Key4 => {
-                                state.cols = 6;
-                                window.request_redraw();
-                            }
-                            VirtualKeyCode::Key5 => {
-                                state.cols = 7;
-                                window.request_redraw();
-                            }
-                            VirtualKeyCode::Key6 => {
-                                state.cols = 8;
-                                window.request_redraw();
-                            }
-                            VirtualKeyCode::Key7 => {
-                                state.cols = 9;
-                                window.request_redraw();
-                            }
-                            VirtualKeyCode::Minus => {
-                                state.cols += 1;
-                                window.request_redraw();
-                            }
-                            VirtualKeyCode::Equals => {
-                                if state.cols > 2 {
-                                    state.cols -= 1;
-                                }
-                                window.request_redraw();
-                            }
-                            VirtualKeyCode::Key8 => {
-                                state.cols = 10;
-                                window.request_redraw();
-                            }
                             VirtualKeyCode::F => {
                                 window.set_simple_fullscreen(!window.simple_fullscreen());
                             }

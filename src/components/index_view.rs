@@ -28,6 +28,38 @@ impl Component for IndexView {
                 }
                 VirtualKeyCode::H | VirtualKeyCode::Left => state.collection.decrement(1),
                 VirtualKeyCode::L | VirtualKeyCode::Right => state.collection.increment(1),
+                VirtualKeyCode::Key1 => {
+                    state.cols = 3;
+                }
+                VirtualKeyCode::Key2 => {
+                    state.cols = 4;
+                }
+                VirtualKeyCode::Key3 => {
+                    state.cols = 5;
+                }
+                VirtualKeyCode::Key4 => {
+                    state.cols = 6;
+                }
+                VirtualKeyCode::Key5 => {
+                    state.cols = 7;
+                }
+                VirtualKeyCode::Key6 => {
+                    state.cols = 8;
+                }
+                VirtualKeyCode::Key7 => {
+                    state.cols = 9;
+                }
+                VirtualKeyCode::Minus => {
+                    state.cols += 1;
+                }
+                VirtualKeyCode::Equals => {
+                    if state.cols > 2 {
+                        state.cols -= 1;
+                    }
+                }
+                VirtualKeyCode::Key8 => {
+                    state.cols = 10;
+                }
                 _ => (),
             },
             _ => (),
