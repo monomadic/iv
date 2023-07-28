@@ -31,12 +31,13 @@ impl Window {
         // go fullscreen
         window.set_simple_fullscreen(true);
 
-        let (width, height): (u32, u32) = window.inner_size().into();
-        app.update(&mut state, &Msg::Resized(width, height));
+        let mut size = window.inner_size().into();
+        app.update(&mut state, &size, &Msg::Init);
 
         let mut pixels = {
-            let surface_texture = SurfaceTexture::new(width, height, &window);
-            Pixels::new(width, height, surface_texture)
+            let surface_texture =
+                SurfaceTexture::new(size.width as u32, size.height as u32, &window);
+            Pixels::new(size.width as u32, size.height as u32, surface_texture)
         }
         .expect("pixels err"); // TODO: coalesce
         pixels.clear_color(pixels::wgpu::Color::BLACK);
@@ -48,7 +49,7 @@ impl Window {
 
             match event {
                 Event::RedrawRequested(window_id) if window_id == window.id() => {
-                    app.draw(&mut state, &mut pixels);
+                    app.draw(&mut state, &size, &mut pixels);
 
                     if pixels.render().is_err() {
                         *control_flow = ControlFlow::Exit;
@@ -60,6 +61,9 @@ impl Window {
                     WindowEvent::CloseRequested => control_flow.set_exit(),
                     WindowEvent::ModifiersChanged(new) => {
                         modifiers = new;
+                    }
+                    WindowEvent::Resized(new_size) => {
+                        size = new_size.into();
                     }
                     WindowEvent::KeyboardInput {
                         input:
@@ -118,29 +122,29 @@ impl Window {
                                 window.set_simple_fullscreen(!window.simple_fullscreen());
                             }
                             VirtualKeyCode::H | VirtualKeyCode::Left => {
-                                if app.update(&mut state, &Msg::MoveLeft) {
+                                if app.update(&mut state, &size, &Msg::MoveLeft) {
                                     window.request_redraw();
                                 }
                             }
                             VirtualKeyCode::L | VirtualKeyCode::Right => {
-                                if app.update(&mut state, &Msg::MoveRight) {
+                                if app.update(&mut state, &size, &Msg::MoveRight) {
                                     window.request_redraw();
                                 }
                             }
                             VirtualKeyCode::J | VirtualKeyCode::Down => {
-                                if app.update(&mut state, &Msg::MoveDown) {
+                                if app.update(&mut state, &size, &Msg::MoveDown) {
                                     window.request_redraw();
                                 }
                             }
                             VirtualKeyCode::K | VirtualKeyCode::Up => {
-                                if app.update(&mut state, &Msg::MoveUp) {
+                                if app.update(&mut state, &size, &Msg::MoveUp) {
                                     window.request_redraw();
                                 }
                             }
                             _ => (),
                         };
 
-                        if app.update(&mut state, &Msg::KeyPress(virtual_code, modifiers)) {
+                        if app.update(&mut state, &size, &Msg::KeyPress(virtual_code, modifiers)) {
                             window.request_redraw();
                         }
                     }

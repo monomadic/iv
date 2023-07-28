@@ -1,13 +1,12 @@
+use pixels::Pixels;
 use winit::event::VirtualKeyCode;
 
 use crate::{msg::Msg, state::AppState};
 
-use super::Component;
+use super::{Component, Rect};
 
 #[derive(Default)]
 pub struct ImageComponent {
-    width: u32,
-    height: u32,
     zoom: Zoom,
 }
 
@@ -20,12 +19,8 @@ pub enum Zoom {
 }
 
 impl Component for ImageComponent {
-    fn update(&mut self, state: &mut AppState, msg: &Msg) -> bool {
+    fn update(&mut self, state: &mut AppState, _size: &Rect, msg: &Msg) -> bool {
         match msg {
-            Msg::Resized(width, height) => {
-                self.width = *width;
-                self.height = *height;
-            }
             Msg::MoveLeft | Msg::MoveUp => {
                 state.collection.decrement(1);
             }
@@ -57,19 +52,20 @@ impl Component for ImageComponent {
                 }
                 _ => (),
             },
+            _ => (),
         }
         true
     }
 
-    fn draw(&mut self, state: &crate::state::AppState, pixels: &mut pixels::Pixels) {
+    fn draw(&mut self, state: &AppState, size: &Rect, pixels: &mut Pixels) {
         match self.zoom {
             Zoom::FitToScreen => {
                 crate::image::clear(pixels);
                 crate::image::copy_and_resize(
                     state.current_image(),
                     pixels,
-                    self.width,
-                    self.height,
+                    size.width as u32,
+                    size.height as u32,
                 );
             }
             Zoom::ZoomToFit => {
@@ -80,31 +76,31 @@ impl Component for ImageComponent {
                 let image = state.current_image();
 
                 if zoom == 1.0 {
-                    let offset_x = self.width / 2 - image.width() / 2;
-                    let offset_y = self.height / 2 - image.height() / 2;
+                    let offset_x = size.width / 2.0 - image.width() as f32 / 2.0;
+                    let offset_y = size.height / 2.0 - image.height() as f32 / 2.0;
 
                     crate::image::copy_with_offset(
                         &image,
                         pixels,
-                        self.width,
-                        self.height,
-                        offset_x,
-                        offset_y,
+                        size.width as u32,
+                        size.height as u32,
+                        offset_x as u32,
+                        offset_y as u32,
                     );
                 } else {
                     let width = (image.width() as f32 * zoom) as u32;
                     let height = (image.height() as f32 * zoom) as u32;
-                    let offset_x = self.width / 2 - width / 2;
-                    let offset_y = self.height / 2 - height / 2;
+                    let offset_x = size.width / 2.0 - width as f32 / 2.0;
+                    let offset_y = size.height / 2.0 - height as f32 / 2.0;
 
                     let image = image.resize(width, height, image::imageops::FilterType::Lanczos3);
                     crate::image::copy_with_offset(
                         &image,
                         pixels,
-                        self.width,
-                        self.height,
-                        offset_x,
-                        offset_y,
+                        size.width as u32,
+                        size.height as u32,
+                        offset_x as u32,
+                        offset_y as u32,
                     );
                 }
             }

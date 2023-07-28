@@ -1,4 +1,5 @@
 use pixels::Pixels;
+use winit::dpi::PhysicalSize;
 
 use crate::{msg::Msg, state::AppState};
 
@@ -13,8 +14,21 @@ pub use index_view::IndexView;
 // - prevents natural caching
 // - but creates natural immutable component state
 
+pub struct Rect {
+    pub width: f32,
+    pub height: f32,
+}
+
+impl From<PhysicalSize<u32>> for Rect {
+    fn from(size: PhysicalSize<u32>) -> Self {
+        Rect {
+            width: size.width as f32,
+            height: size.height as f32,
+        }
+    }
+}
+
 pub trait Component {
-    fn draw(&mut self, state: &AppState, pixels: &mut Pixels);
-    fn update(&mut self, state: &mut AppState, msg: &Msg) -> bool;
-    // fn children(&self) -> Vec<&Self>;
+    fn draw(&mut self, state: &AppState, size: &Rect, pixels: &mut Pixels);
+    fn update(&mut self, state: &mut AppState, size: &Rect, msg: &Msg) -> bool;
 }

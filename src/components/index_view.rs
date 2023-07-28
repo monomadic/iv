@@ -3,26 +3,19 @@ use winit::event::VirtualKeyCode;
 
 use crate::{msg::Msg, state::AppState};
 
-use super::Component;
+use super::{Component, Rect};
 
 #[derive(Default)]
-pub struct IndexView {
-    width: u32,
-    height: u32,
-}
+pub struct IndexView;
 
 impl Component for IndexView {
-    fn update(&mut self, state: &mut AppState, msg: &Msg) -> bool {
+    fn update(&mut self, state: &mut AppState, size: &Rect, msg: &Msg) -> bool {
         // move the selected thumbnail
         match msg {
             Msg::MoveUp => state.collection.decrement(state.cols as usize),
             Msg::MoveDown => state.collection.increment(state.cols as usize),
             Msg::MoveLeft => state.collection.decrement(1),
             Msg::MoveRight => state.collection.increment(1),
-            Msg::Resized(width, height) => {
-                self.width = *width;
-                self.height = *height;
-            }
             Msg::KeyPress(key, modifiers) => match key {
                 VirtualKeyCode::G => {
                     if modifiers.shift() {
@@ -33,43 +26,56 @@ impl Component for IndexView {
                 }
                 _ => (),
             },
+            _ => (),
         }
 
         // precache visible images
-        for key in self.visible_images(&state, state.cols as f32, state.thumbnail_padding as f32) {
-            let (width, height) =
-                self.inner_image_dimensions(state.cols as f32, state.thumbnail_padding as f32);
+        for key in self.visible_images(
+            &state,
+            size.width,
+            size.height,
+            state.cols as f32,
+            state.thumbnail_padding as f32,
+        ) {
+            let (width, height) = self.inner_image_dimensions(
+                size.width,
+                state.cols as f32,
+                state.thumbnail_padding as f32,
+            );
             state.cache(&key, width as u32, height as u32);
         }
         true
     }
 
-    fn draw(&mut self, state: &AppState, buffer: &mut Pixels) {
+    fn draw(&mut self, state: &AppState, size: &Rect, buffer: &mut Pixels) {
         let padding = state.thumbnail_padding;
 
         let cols = state.cols as f32;
-        let rows = self.height as f32 / (self.width as f32 / cols);
+        let rows = size.height / (size.width / cols);
 
-        let frame_w = self.width as f32;
-        let frame_h = self.height as f32;
+        let frame_w = size.width;
+        let frame_h = size.height;
 
         let thumbnail_width = frame_w / cols;
         let thumbnail_height = frame_h / rows;
 
         let selected = state.cursor();
-        let rowskip = self.rowskip(selected, cols);
+        let rowskip = self.rowskip(size.width, size.height, selected, cols);
 
         buffer.clear_color(pixels::wgpu::Color::BLACK);
         crate::image::clear(buffer);
 
         for (i, path) in self
-            .visible_images(&state, cols, padding as f32)
+            .visible_images(&state, size.width, size.height, cols, padding as f32)
             .iter()
             .enumerate()
         {
             // Retrieve thumbnail from the cache
-            let (width, _height) =
-                self.inner_image_dimensions(cols as f32, state.thumbnail_padding as f32);
+            let (width, _height) = self.inner_image_dimensions(
+                size.width,
+                cols as f32,
+                state.thumbnail_padding as f32,
+            );
 
             let thumb = state
                 .cache
@@ -116,35 +122,43 @@ impl Component for IndexView {
 }
 
 impl IndexView {
-    fn inner_image_dimensions(&self, cols: f32, padding: f32) -> (f32, f32) {
-        let width = self.thumb_height(cols, padding) - padding * 2.0;
-        let height = self.thumb_height(cols, padding) - padding * 2.0;
-        (width, height)
+    fn inner_image_dimensions(&self, width: f32, cols: f32, padding: f32) -> (f32, f32) {
+        (
+            self.thumb_height(width, cols, padding),
+            self.thumb_height(width, cols, padding),
+        )
     }
 
-    fn visible_images(&self, state: &AppState, cols: f32, padding: f32) -> Vec<String> {
+    fn visible_images(
+        &self,
+        state: &AppState,
+        width: f32,
+        height: f32,
+        cols: f32,
+        padding: f32,
+    ) -> Vec<String> {
         state
             .collection
             .keys
             .iter()
-            .skip((self.rowskip(state.cursor(), cols) * cols) as usize)
-            .take(self.number_of_visible_images(cols as f32, padding) as usize)
+            .skip((self.rowskip(width, height, state.cursor(), cols) * cols) as usize)
+            .take(self.number_of_visible_images(width, height, cols as f32, padding) as usize)
             .map(|p| p.clone())
             .collect()
     }
 
     // The maximum amount of images displayed on screen
-    fn number_of_visible_images(&self, cols: f32, padding: f32) -> f32 {
-        cols * (self.height as f32 / self.thumb_height(cols, padding)).ceil()
+    fn number_of_visible_images(&self, width: f32, height: f32, cols: f32, padding: f32) -> f32 {
+        cols * (height / self.thumb_height(width, cols, padding)).ceil()
     }
 
-    fn thumb_height(&self, cols: f32, padding: f32) -> f32 {
-        self.width as f32 / cols - padding * 2.0
+    fn thumb_height(&self, width: f32, cols: f32, padding: f32) -> f32 {
+        (width - padding * 2.0 * cols) / cols
     }
 
-    fn rowskip(&self, cursor: usize, cols: f32) -> f32 {
+    fn rowskip(&self, width: f32, height: f32, cursor: usize, cols: f32) -> f32 {
         let current_row = (cursor as f32 / cols) + 1.0;
-        let rows_visible = self.height as f32 / (self.width as f32 / cols);
+        let rows_visible = height / (width / cols);
 
         if current_row > rows_visible {
             (current_row - rows_visible + 1.0).floor()
