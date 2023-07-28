@@ -12,10 +12,6 @@ impl Component for IndexView {
     fn update(&mut self, state: &mut AppState, size: &Rect, msg: &Msg) -> bool {
         // move the selected thumbnail
         match msg {
-            Msg::MoveUp => state.collection.decrement(state.cols as usize),
-            Msg::MoveDown => state.collection.increment(state.cols as usize),
-            Msg::MoveLeft => state.collection.decrement(1),
-            Msg::MoveRight => state.collection.increment(1),
             Msg::KeyPress(key, modifiers) => match key {
                 VirtualKeyCode::G => {
                     if modifiers.shift() {
@@ -24,6 +20,14 @@ impl Component for IndexView {
                         state.collection.move_to_beginning();
                     }
                 }
+                VirtualKeyCode::K | VirtualKeyCode::Up => {
+                    state.collection.decrement(state.cols as usize)
+                }
+                VirtualKeyCode::J | VirtualKeyCode::Down => {
+                    state.collection.increment(state.cols as usize)
+                }
+                VirtualKeyCode::H | VirtualKeyCode::Left => state.collection.decrement(1),
+                VirtualKeyCode::L | VirtualKeyCode::Right => state.collection.increment(1),
                 _ => (),
             },
             _ => (),
@@ -84,9 +88,7 @@ impl Component for IndexView {
 
             let i = i as f32;
 
-            // calculate x position
             let offset_x = (i % cols) * thumbnail_width;
-            // calculate y position
             let offset_y = (i / cols).floor() * thumbnail_height;
 
             // center horizontally

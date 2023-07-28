@@ -28,7 +28,6 @@ impl Component for AppComponent {
                 }
                 _ => (),
             },
-            _ => (),
         }
 
         // update children

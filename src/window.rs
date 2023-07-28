@@ -121,26 +121,6 @@ impl Window {
                             VirtualKeyCode::F => {
                                 window.set_simple_fullscreen(!window.simple_fullscreen());
                             }
-                            VirtualKeyCode::H | VirtualKeyCode::Left => {
-                                if app.update(&mut state, &size, &Msg::MoveLeft) {
-                                    window.request_redraw();
-                                }
-                            }
-                            VirtualKeyCode::L | VirtualKeyCode::Right => {
-                                if app.update(&mut state, &size, &Msg::MoveRight) {
-                                    window.request_redraw();
-                                }
-                            }
-                            VirtualKeyCode::J | VirtualKeyCode::Down => {
-                                if app.update(&mut state, &size, &Msg::MoveDown) {
-                                    window.request_redraw();
-                                }
-                            }
-                            VirtualKeyCode::K | VirtualKeyCode::Up => {
-                                if app.update(&mut state, &size, &Msg::MoveUp) {
-                                    window.request_redraw();
-                                }
-                            }
                             _ => (),
                         };
 

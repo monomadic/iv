@@ -21,12 +21,6 @@ pub enum Zoom {
 impl Component for ImageComponent {
     fn update(&mut self, state: &mut AppState, _size: &Rect, msg: &Msg) -> bool {
         match msg {
-            Msg::MoveLeft | Msg::MoveUp => {
-                state.collection.decrement(1);
-            }
-            Msg::MoveRight | Msg::MoveDown => {
-                state.collection.increment(1);
-            }
             Msg::KeyPress(key, _modifiers) => match key {
                 VirtualKeyCode::Key1 => {
                     self.zoom = Zoom::Zoom(1.0);
@@ -49,6 +43,19 @@ impl Component for ImageComponent {
                         Zoom::ZoomToFit => Zoom::FitToScreen,
                         Zoom::Zoom(_) => Zoom::ZoomToFit,
                     }
+                }
+                VirtualKeyCode::J
+                | VirtualKeyCode::Down
+                | VirtualKeyCode::L
+                | VirtualKeyCode::Right => {
+                    state.collection.increment(1);
+                }
+
+                VirtualKeyCode::K
+                | VirtualKeyCode::Up
+                | VirtualKeyCode::H
+                | VirtualKeyCode::Left => {
+                    state.collection.decrement(1);
                 }
                 _ => (),
             },
