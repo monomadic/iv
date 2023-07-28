@@ -24,7 +24,7 @@ impl Component for AppComponent {
                 self.solo_view.update(state, config, msg);
                 self.index_view.update(state, config, msg);
             }
-            Msg::KeyPress(key) => match key {
+            Msg::KeyPress(key, modifiers) => match key {
                 _ => (),
             },
             _ => (),

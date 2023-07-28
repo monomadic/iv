@@ -1,4 +1,4 @@
-use winit::event::VirtualKeyCode;
+use winit::event::{ModifiersState, VirtualKeyCode};
 
 #[derive(Debug)]
 pub enum Msg {
@@ -7,5 +7,5 @@ pub enum Msg {
     MoveLeft,
     MoveRight,
     Resized(u32, u32),
-    KeyPress(VirtualKeyCode),
+    KeyPress(VirtualKeyCode, ModifiersState),
 }

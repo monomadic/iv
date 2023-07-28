@@ -59,6 +59,14 @@ impl AssetCollection {
             self.cursor = 0;
         }
     }
+
+    pub fn move_to_beginning(&mut self) {
+        self.cursor = 0;
+    }
+
+    pub fn move_to_end(&mut self) {
+        self.cursor = self.keys.len() - 1;
+    }
 }
 
 #[cfg(test)]

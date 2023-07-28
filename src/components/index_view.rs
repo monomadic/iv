@@ -1,4 +1,5 @@
 use pixels::Pixels;
+use winit::event::VirtualKeyCode;
 
 use crate::{config::Config, msg::Msg, state::AppState};
 
@@ -22,7 +23,14 @@ impl Component for IndexView {
                 self.width = *width;
                 self.height = *height;
             }
-            Msg::KeyPress(key) => match key {
+            Msg::KeyPress(key, modifiers) => match key {
+                VirtualKeyCode::G => {
+                    if modifiers.shift() {
+                        state.collection.move_to_end();
+                    } else {
+                        state.collection.move_to_beginning();
+                    }
+                }
                 _ => (),
             },
         }

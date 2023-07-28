@@ -1,3 +1,5 @@
+use winit::event::VirtualKeyCode;
+
 use crate::{config::Config, msg::Msg, state::AppState};
 
 use super::Component;
@@ -28,7 +30,7 @@ impl Component for ImageComponent {
             Msg::MoveRight | Msg::MoveDown => {
                 state.collection.increment(1);
             }
-            Msg::KeyPress(key) => match key {
+            Msg::KeyPress(key, modifiers) => match key {
                 _ => (),
             },
         }

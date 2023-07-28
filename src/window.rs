@@ -3,7 +3,7 @@ use pixels::{Pixels, SurfaceTexture};
 #[cfg(target_os = "macos")]
 use winit::platform::macos::WindowExtMacOS;
 use winit::{
-    event::{ElementState, Event, KeyboardInput, VirtualKeyCode, WindowEvent},
+    event::{ElementState, Event, KeyboardInput, ModifiersState, VirtualKeyCode, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,
 };
@@ -21,6 +21,8 @@ pub struct Window;
 impl Window {
     pub fn new(mut state: AppState, mut app: AppComponent, config: Config) -> Result<()> {
         let event_loop = EventLoop::new();
+        // keyboard modifier state
+        let mut modifiers = ModifiersState::default();
         let window = WindowBuilder::new()
             .with_title("iV")
             .with_decorations(false)
@@ -57,6 +59,9 @@ impl Window {
 
                 Event::WindowEvent { event, .. } => match event {
                     WindowEvent::CloseRequested => control_flow.set_exit(),
+                    WindowEvent::ModifiersChanged(new) => {
+                        modifiers = new;
+                    }
                     WindowEvent::KeyboardInput {
                         input:
                             KeyboardInput {
@@ -140,7 +145,8 @@ impl Window {
                             _ => (),
                         };
 
-                        if app.update(&mut state, &config, &Msg::KeyPress(virtual_code)) {
+                        if app.update(&mut state, &config, &Msg::KeyPress(virtual_code, modifiers))
+                        {
                             window.request_redraw();
                         }
                     }
