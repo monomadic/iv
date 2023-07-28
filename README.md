@@ -4,7 +4,11 @@
 
 # IV
 
-_Warning: still in development, please don't use this yet._
+<p align="center">
+https://github.com/monomadic/iv/assets/129359/b418bcdd-55c9-4618-bf0d-69749212a5b0
+</p>
+
+[Longer video on youtube](https://www.youtube.com/watch?v=fRtqc5lyWBE)
 
 IV (pronounced ivy) is a fast minimal image gallery viewer. There seem to be many image viewer apps (even in rust) and they all seemed terrible to me and my workflow, and this is the result of that frustration.
 
