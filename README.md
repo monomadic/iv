@@ -2,11 +2,11 @@
   <img src="assets/banner.jpg" />
 </p>
 
-# IV
+# IV: Lightning Fast Image Browsing
 
-<p align="center">
+Designed in a suckless way, mostly for terminal users.
+
 https://github.com/monomadic/iv/assets/129359/b418bcdd-55c9-4618-bf0d-69749212a5b0
-</p>
 
 [Longer video on youtube](https://www.youtube.com/watch?v=fRtqc5lyWBE)
 
