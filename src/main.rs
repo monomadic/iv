@@ -11,6 +11,9 @@ mod window;
 
 fn main() -> Result<(), error::IVError> {
     // Parse cli arguments
+    // TODO: switch to clap to accept the path argument
+    // TODO: add a flag to start in gallery mode
+    // TODO: add a flag to start in fullscreen mode
     let path: &str = &std::env::args().nth(1).unwrap_or(".".into());
 
     // Determine whether to start in gallery or single mode

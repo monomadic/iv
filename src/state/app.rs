@@ -1,13 +1,18 @@
 use image::io::Reader as ImageReader;
 use image::DynamicImage;
 
-use crate::{cache::ImageCache, config::Config, prelude::*};
+use crate::{
+    cache::ImageCache,
+    config::{Config, Keymaps},
+    prelude::*,
+};
 use std::collections::HashMap;
 
 use super::{collection::AssetCollection, LayoutState};
 
 #[derive(Default)]
 pub struct AppState {
+    // TODO: create an on-demand file loading cache
     pub files: HashMap<String, DynamicImage>,
     pub collection: AssetCollection,
     pub layout_state: LayoutState,
@@ -18,6 +23,8 @@ pub struct AppState {
 
     pub thumbnail_padding: u32,
     pub thumbnail_border_thickness: u32,
+
+    pub keymaps: Keymaps,
 }
 
 impl AppState {
@@ -46,6 +53,7 @@ impl AppState {
             placeholder,
             thumbnail_padding: config.thumbnail_padding,
             thumbnail_border_thickness: config.thumbnail_border_thickness,
+            keymaps: config.keymaps,
         })
     }
 
@@ -55,6 +63,10 @@ impl AppState {
 
     pub fn cursor(&self) -> usize {
         self.collection.cursor
+    }
+
+    pub fn up_directory(&mut self) {
+        todo!()
     }
 
     pub fn cache(&mut self, key: &str, width: u32, height: u32) {

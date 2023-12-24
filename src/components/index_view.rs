@@ -28,6 +28,9 @@ impl Component for IndexView {
                 }
                 VirtualKeyCode::H | VirtualKeyCode::Left => state.collection.decrement(1),
                 VirtualKeyCode::L | VirtualKeyCode::Right => state.collection.increment(1),
+                VirtualKeyCode::U => {
+                    state.up_directory();
+                }
                 VirtualKeyCode::Key1 => {
                     state.cols = 3;
                 }
